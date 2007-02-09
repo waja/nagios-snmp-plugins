@@ -1,0 +1,263 @@
+nagios-snmp-plugins for Debian
+------------------------------
+
+   If you are using snmp v1 and v2c, you can provide your community as last
+   argument with your check_command. So you can specify different communities
+   for different services. With snmp v3 you need to set $USER9$ like shown in
+   the config snipsets in your resource.cfg or you need to modify your
+   command definitions!
+
+   See http://www.manubulon.com/nagios/index_commands.html#snmplogin
+   and http://www.manubulon.com/nagios/index_info.html#snmplogin
+
+ -- Jan Wagner <waja@cyconet.org>  Fri, 26 Jan 2007 16:32:47 +0100
+
+   These snipsets are dumped from nagios-snmp-plugins website.
+   Look at <http://www.manubulon.com/nagios/index_commands.html> and 
+   <http://www.manubulon.com/nagios/index_info.html> for more (actual) info!
+
+   Here are commands example to use the scripts with nagios.
+
+   All these commands use $USER<n>$ macros to put snmp login. You
+   have to do this for these examples to work.
+   The $USER<n>$ macro are defined in the resources.cfg file
+
+   If you are using snmp v1 :
+   $USER7$=-C <community>
+
+   If you are using snmp v2c :
+   $USER7$=-C <community> -2
+
+   Examples of snmp v3 login :
+   AuthNoPriv (md5) :
+   $USER8$=-l <login> -x <pass>
+
+   AuthPriv (md5,aes) :
+   $USER8$=-l <login> -x <pass> -X <pass> -L md5,aes
+
+   About regular expressions
+
+   With all these scripts, when you select an interface, a service or process name
+   etc... you use by default regular expresions :
+   Note : you can disable this by using "-r"
+
+   Examples : Don't forget it is perl regular expressions.
+   Regexp 	Will match
+   eth 		eth0, eth1, eth2 but also Fastethernet0/0 ....
+   eth[1-9] 	eth1, eth2, ... eth9 but also eth10, eth11
+   eth[1-2]$ 	eth1, eth2 only (not eth11 for ex).
+   dhcp 	dhcpc, dhpcd
+
+*  check_snmp_cpfw.pl
+
+   define command {
+	command_name check_snmp_cpfw_v3
+	command_line $USER1$/check_snmp_cpfw.pl -H $HOSTADDRESS$ $USER8$
+	$ARG1$
+   }
+
+   define service {
+	name checkpoint_verification
+	check_command check_snmp_cpfw_v3!-swa -p Solsoft_Policy \
+   -c 100000,200000 -f
+   }
+
+*  check_snmp_load.pl
+
+   define command {
+	command_name check_snmp_load_v1
+	command_line $USER1$/check_snmp_load.pl -H $HOSTADDRESS$ $USER7$ -T
+   $ARG1$ -w $ARG2$ -c $ARG3$ $ARG4$
+   }
+
+   define command {
+	command_name check_snmp_load_v3
+	command_line $USER1$/check_snmp_load.pl -H $HOSTADDRESS$ $USER8$ -T
+   $ARG1$ -w $ARG2$ -c $ARG3$ $ARG4$
+   }
+
+   define service {
+	name bluecoat_load
+	check_command check_snmp_load_v1!bc!95!99
+   }
+
+   define service {
+	name Linux_load
+	check_command check_snmp_load_v1!netsl!4,3,3!8,5,5
+   }
+
+   define service {
+	name Cisco_load
+	check_command check_snmp_load_v1!cisco!90,80,60!100,100,100
+   }
+
+   define service {
+	name lp_load
+	check_command check_snmp_load_v1!lp!90!99
+   }
+
+*  check_snmp_interface.pl
+
+   define command {
+	command_name check_snmp_int_v1
+	command_line $USER1$/check_snmp_int.pl -H $HOSTADDRESS$ $USER7$ -n
+   $ARG1$ $ARG2$
+   }
+
+   define command{
+	command_name check_snmp_int_v3
+	command_line $USER1$/check_snmp_int.pl -H $HOSTADDRESS$ $USER8$ -n
+   $ARG1$ $ARG2$
+   }
+
+   define service {
+	name check_int_1_6
+	check_command check_snmp_int_v1!"FastEthernet-[1-6]"
+   }
+
+   define service {
+	name check_int_eth0_bdw
+	check_command check_snmp_int_v3!eth0!-k -w 100,50 -c 0,0
+   }
+
+*  check_snmp_mem.pl
+
+   define command {
+	command_name check_snmp_mem_v1
+	command_line $USER1$/check_snmp_mem.pl -H $HOSTADDRESS$ $USER7$ $ARG1$
+   -w $ARG2$ -c $ARG3$ $ARG4$
+   }
+
+   define command {
+	command_name check_snmp_mem_v3
+	command_line $USER1$/check_snmp_mem.pl -H $HOSTADDRESS$ $USER8$ $ARG1$
+   -w $ARG2$ -c $ARG3$ $ARG4$
+   }
+
+   define service {
+	name Linux_memory
+	check_command check_snmp_mem_v1!-N!95,60!99,90
+   }
+
+   define service {
+	name Cisco_mem
+	check_command check_snmp_mem_v1!-I!80!99
+   }
+
+*  check_snmp_process.pl
+
+   define command {
+	command_name check_snmp_process_v1
+	command_line $USER1$/check_snmp_process.pl -H $HOSTADDRESS$ $USER7$ -n
+   $ARG1$ -w $ARG2$ -c $ARG3$ $ARG4$
+   }
+
+   define service {
+	name proxy_checks
+	check_command check_snmp_process_v1!proxy!21,1999!20,2000!-2
+   }
+
+   define service {
+	name Check_httpd_all
+	check_command check_snmp_process_v1!httpd!5,100!0!-2 -m 20,30 -u 90,99
+   }
+
+   define service {
+	name check_crontab
+	service_description Check Crontab service
+	check_command check_snmp_process!crond!0!0
+   }
+
+*  check_snmp_storage.pl
+
+   define command {
+	command_name check_snmp_storage_v1
+	command_line $USER1$/check_snmp_storage.pl -H $HOSTADDRESS$ $USER7$ -m
+   $ARG1$ -w $ARG2$ -c $ARG3$ $ARG4$
+   }
+
+   define command {
+	command_name check_snmp_storage_v3
+	command_line $USER1$/check_snmp_storage.pl -H $HOSTADDRESS$ $USER8$ -m
+   $ARG1$ -w $ARG2$ -c $ARG3$ $ARG4$
+   }
+
+   define service {
+	name Check_LinDisk_home
+	service_description Check /home
+	check_command check_snmp_storage_v3!/home!90!97!-r
+   }
+
+   define service {
+	name Win_check_swap
+	service_description Check Windows swap
+	check_command check_snmp_storage_v3!Virtual!60!90
+   }
+
+   define service {
+	name check_linux_swap
+	service_description Check swap linux
+	check_command check_snmp_storage_v1!Swap!60!90!
+   }
+
+   define service {
+	name check_disk_all
+	service_description Check / /opt /var /config
+	check_command check_snmp_storage_v1!"^/$|opt|config|var"!80!90!
+   }
+
+*  check_snmp_vrrp.pl
+
+   define command {
+	command_name check_snmp_vrrp_v1
+	command_line $USER1$/check_snmp_vrrp.pl -H $HOSTADDRESS$ $USER7$ -T
+   $ARG1$ -s $ARG2$
+   }
+
+   define command {
+	command_name check_snmp_vrrp_v3
+	command_line $USER1$/check_snmp_vrrp.pl -H $HOSTADDRESS$ $USER8$ -T
+   $ARG1$ -s $ARG2$
+   }
+
+   define service {
+	name Linkproof_check_vrrp_master
+	service_description Check vrrp in master state
+	check_command check_snmp_vrrp_v3!lp!master
+   }
+
+   define service {
+	name Linkproof_check_vrrp_backup
+	service_description Check vrrp in backup state
+	check_command check_snmp_vrrp_v3!lp!backup
+   }
+
+   define service {
+	name Nokia_clustering
+	check_command check_snmp_vrrp_v3!ipso!2,98%
+   }
+
+*  check_snmp_win.pl
+
+   define command {
+	command_name check_win
+	command_line $USER1$/check_snmp_win.pl -H $HOSTADDRESS$ $USER7$ -n
+   $ARG2$
+   # comment community service(s) name
+   }
+
+   define service {
+	name check_win_dhcp
+	service_description Check dhcp service
+	check_command check_win!dhcp
+	register 0
+   }
+
+   define service {
+	name check_win_reg_spool
+	service_description Verification acces au registre en spooleur
+	check_command check_win!"au registre",spouleur
+	register 0
+   }
+
+ -- Jan Wagner <waja@cyconet.org>  Tue,  5 Dec 2006 11:52:19 +0100

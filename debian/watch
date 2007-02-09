@@ -1,0 +1,2 @@
+version=3
+http://www.manubulon.com/nagios/nagios-snmp-plugins\.(.*)\.tgz debian uupdate

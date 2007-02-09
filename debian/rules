@@ -1,0 +1,66 @@
+#!/usr/bin/make -f
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+COMMANDDEFPATH:=/etc/nagios-plugins/config/
+NP_DIR:=debian/nagios-snmp-plugins
+NP_TEMPLATES:=$(NP_DIR)/usr/share/nagios-snmp-plugins/pluginconfig
+NP_LIBEXEC:=/usr/lib/nagios/plugins
+
+plugin_cfgs:=snmp_cpfw snmp_env snmp_int snmp_load snmp_mem snmp_process \
+	snmp_storage snmp_vrrp snmp_win
+
+build:
+
+clean:
+	dh_testdir
+	dh_testroot
+
+	dh_clean
+	-rm -f debian/postrm
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+
+	# Add here commands to install the package into debian/nagios-snmp-plugins.
+	for PLUGINS in *.pl; \
+	do \
+		install -D -m 0755 $$PLUGINS $(NP_DIR)$(NP_LIBEXEC)/$$PLUGINS || exit 1; \
+		sed -i "s#/usr/local/nagios/libexec#$(NP_LIBEXEC)#" $(NP_DIR)$(NP_LIBEXEC)/$$PLUGINS || exit 1; \
+	done
+	# copying templates them into seperate "template" directories outside of
+	# /usr/share/doc for ucf to use.
+	install -d $(NP_DIR)/usr/share/nagios-snmp-plugins/pluginconfig
+	for c in ${plugin_cfgs}; do \
+		cp debian/pluginconfig/$${c}.cfg ${NP_TEMPLATES}; \
+	done
+	# here the list of config templates are writen to postrm
+	sed -e 's/@PLUGINS@/${plugin_cfgs}/' \
+		< debian/postrm.in \
+		> debian/postrm
+
+# Build architecture-independent files here.
+binary-indep: build install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs
+	dh_installdocs
+	dh_link
+	dh_compress
+	dh_fixperms
+	dh_perl
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+# Build architecture-dependent files here.
+binary-arch: build install
+# We have nothing to do for now.
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install

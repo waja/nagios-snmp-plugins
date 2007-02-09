@@ -1,0 +1,21 @@
+#!/bin/sh -e
+
+templdir=/usr/share/nagios-snmp-plugins/pluginconfig
+
+if [ "$1" = "configure" ]; then
+	if [ -f /usr/share/nagios-plugins/dpkg/functions ]; then
+		# only working with nagios-plugins-basic (>= 1.4.5-2)
+		. /usr/share/nagios-plugins/dpkg/functions
+		register_cfgs $2
+	else
+		# to get working with etch
+		(
+			cd $templdir
+			for f in *cfg; do
+				ucf $f /etc/nagios-plugins/config/$f
+			done
+		);
+	fi
+fi
+
+#DEBHELPER#

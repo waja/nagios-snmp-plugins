@@ -1,0 +1,15 @@
+Source: nagios-snmp-plugins
+Section: net
+Priority: optional
+Maintainer: Jan Wagner <waja@cyconet.org>
+Build-Depends: debhelper (>= 5)
+Standards-Version: 3.7.2
+
+Package: nagios-snmp-plugins
+Architecture: all
+Depends: ${perl:Depends}, libnet-snmp-perl, perl-base (>= 5.8.4-8), ucf
+Suggests: nagios-plugins-basic (>= 1.4.5-2)
+Description: SNMP Plugins for nagios
+ A set of Nagios plugins to check hosts/devices using snmp protocol
+ .
+  Homepage: <http://www.manubulon.com/nagios/index_snmp.html>
