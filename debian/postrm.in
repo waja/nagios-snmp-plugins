@@ -11,7 +11,9 @@ if [ "$1" = "purge" ]; then
 		if [ "$have_ucf" = "yes" ]; then
 			ucf --purge /etc/nagios-plugins/config/${f}.cfg
 		fi
-	done 
+	done
 fi
 
 #DEBHELPER#
+
+exit 0
