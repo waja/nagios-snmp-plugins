@@ -10,10 +10,8 @@ nagios-snmp-plugins for Debian
    See http://www.manubulon.com/nagios/index_commands.html#snmplogin
    and http://www.manubulon.com/nagios/index_info.html#snmplogin
 
- -- Jan Wagner <waja@cyconet.org>  Fri, 26 Jan 2007 16:32:47 +0100
-
    These snipsets are dumped from nagios-snmp-plugins website.
-   Look at <http://www.manubulon.com/nagios/index_commands.html> and 
+   Look at <http://www.manubulon.com/nagios/index_commands.html> and
    <http://www.manubulon.com/nagios/index_info.html> for more (actual) info!
 
    Here are commands example to use the scripts with nagios.
@@ -259,5 +257,4 @@ nagios-snmp-plugins for Debian
 	check_command check_win!"au registre",spouleur
 	register 0
    }
-
- -- Jan Wagner <waja@cyconet.org>  Tue,  5 Dec 2006 11:52:19 +0100
+ -- Jan Wagner <waja@cyconet.org>  Fri, 26 Jan 2007 16:32:47 +0100
