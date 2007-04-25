@@ -42,6 +42,9 @@ install: build
 	sed -e 's/@PLUGINS@/${plugin_cfgs}/' \
 		< debian/postrm.in \
 		> debian/postrm
+	# copy html documentation over
+	install -d $(NP_DIR)/usr/share/doc/nagios-snmp-plugins/html/
+	cp doc/* $(NP_DIR)/usr/share/doc/nagios-snmp-plugins/html/
 
 # Build architecture-independent files here.
 binary-indep: build install

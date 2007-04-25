@@ -1,3 +1,10 @@
+nagios-snmp-plugins (1.1.1-1) unstable; urgency=low
+
+  * new upstream
+  * include (new) html docs into package
+
+ -- Jan Wagner <waja@cyconet.org>  Wed, 25 Apr 2007 22:00:50 +0200
+
 nagios-snmp-plugins (1.1-1) unstable; urgency=low
 
   * Initial release (Closes: #401678).
