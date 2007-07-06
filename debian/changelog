@@ -1,3 +1,10 @@
+nagios-snmp-plugins (1.1.1-2) unstable; urgency=low
+
+  * make use of dpatch infrastructure
+  * include a fix for check_snmp_env.pl from cvs
+
+ -- Jan Wagner <waja@cyconet.org>  Fri,  6 Jul 2007 22:22:02 +0200
+
 nagios-snmp-plugins (1.1.1-1) unstable; urgency=low
 
   * new upstream
