@@ -4,7 +4,10 @@ Priority: optional
 Maintainer: Debian Nagios Maintainer Group <pkg-nagios-devel@lists.alioth.debian.org>
 Uploaders: Jan Wagner <waja@cyconet.org>
 Build-Depends: debhelper (>= 5), dpatch
-Standards-Version: 3.7.2
+Homepage: http://www.manubulon.com/nagios/index_snmp.html
+Vcs-Browser: http://svn.debian.org/wsvn/pkg-nagios/nagios-snmp-plugins/
+Vcs-Svn: svn://svn.debian.org/pkg-nagios/nagios-snmp-plugins/
+Standards-Version: 3.7.3
 
 Package: nagios-snmp-plugins
 Architecture: all
@@ -12,5 +15,3 @@ Depends: ${perl:Depends}, ${misc:Depends}, libnet-snmp-perl, perl-base (>= 5.8.4
 Suggests: nagios-plugins-basic (>= 1.4.5-2)
 Description: SNMP Plugins for nagios
  A set of Nagios plugins to check hosts/devices using snmp protocol
- .
-  Homepage: <http://www.manubulon.com/nagios/index_snmp.html>
