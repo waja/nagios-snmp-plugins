@@ -4,6 +4,8 @@ nagios-snmp-plugins (1.1.1-3) UNRELEASED; urgency=low
   * add option for scale of bandwidth to interface check
   * added Vcs- fields, moved Homepage into source header's field
   * bump standards version to 3.7.3
+  * add 02_disable_epn.dpatch to disable epn, since the plugins don't
+    work with it
 
  -- Jan Wagner <waja@cyconet.org>  Sun,  9 Dec 2007 23:25:38 +0200
 
