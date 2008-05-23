@@ -1,0 +1,133 @@
+#!/bin/sh /usr/share/dpatch/dpatch-run
+## 50_disable_epn.dpatch by Jan Wagner <waja@cyconet.org>
+##
+## DP: leave marks to disable epn
+
+@DPATCH@
+
+diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_boostedge.pl nagios-snmp-plugins-1.1.1/check_snmp_boostedge.pl
+--- nagios-snmp-plugins-1.1.1.orig/check_snmp_boostedge.pl	2007-01-16 23:57:14.000000000 +0100
++++ nagios-snmp-plugins-1.1.1/check_snmp_boostedge.pl	2008-05-23 14:09:04.000000000 +0200
+@@ -1,4 +1,5 @@
+ #!/usr/bin/perl -w 
++# nagios: -epn
+ ############################## check_snmp_boostedge.pl #################
+ # Version : 1.0
+ # Date : Jan 16 2007
+diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_cpfw.pl nagios-snmp-plugins-1.1.1/check_snmp_cpfw.pl
+--- nagios-snmp-plugins-1.1.1.orig/check_snmp_cpfw.pl	2007-04-20 00:03:30.000000000 +0200
++++ nagios-snmp-plugins-1.1.1/check_snmp_cpfw.pl	2008-05-23 14:09:09.000000000 +0200
+@@ -1,4 +1,5 @@
+ #!/usr/bin/perl -w 
++# nagios: -epn
+ ############################## check_snmp_cpfw ##############
+ # Version : 1.2.1
+ # Date : April 19 2007
+diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_css_main.pl nagios-snmp-plugins-1.1.1/check_snmp_css_main.pl
+--- nagios-snmp-plugins-1.1.1.orig/check_snmp_css_main.pl	2006-10-05 23:40:55.000000000 +0200
++++ nagios-snmp-plugins-1.1.1/check_snmp_css_main.pl	2008-05-23 14:09:25.000000000 +0200
+@@ -1,4 +1,5 @@
+ #!/usr/bin/perl -w 
++# nagios: -epn
+ ############################## check_snmp_css_main.pl #################
+ # Version : 1.0	
+ # Date : 27 Sept 2006
+diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_css.pl nagios-snmp-plugins-1.1.1/check_snmp_css.pl
+--- nagios-snmp-plugins-1.1.1.orig/check_snmp_css.pl	2007-01-11 17:06:08.000000000 +0100
++++ nagios-snmp-plugins-1.1.1/check_snmp_css.pl	2008-05-23 14:09:18.000000000 +0200
+@@ -1,4 +1,5 @@
+ #!/usr/bin/perl -w 
++# nagios: -epn
+ ############################## check_snmp_css.pl #################
+ # Version : 1.0.1
+ # Date : 27 Sept 2006
+diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_env.pl nagios-snmp-plugins-1.1.1/check_snmp_env.pl
+--- nagios-snmp-plugins-1.1.1.orig/check_snmp_env.pl	2008-05-23 14:05:14.000000000 +0200
++++ nagios-snmp-plugins-1.1.1/check_snmp_env.pl	2008-05-23 14:09:32.000000000 +0200
+@@ -1,4 +1,5 @@
+ #!/usr/bin/perl -w 
++# nagios: -epn
+ ############################## check_snmp_env #################
+ # Version : 1.3
+ # Date : May 24 2007
+diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_int.pl nagios-snmp-plugins-1.1.1/check_snmp_int.pl
+--- nagios-snmp-plugins-1.1.1.orig/check_snmp_int.pl	2008-05-23 14:05:14.000000000 +0200
++++ nagios-snmp-plugins-1.1.1/check_snmp_int.pl	2008-05-23 14:09:39.000000000 +0200
+@@ -1,4 +1,5 @@
+ #!/usr/bin/perl -w
++# nagios: -epn
+ ############################## check_snmp_int ##############
+ my $Version='1.24';
+ # Date : Oct 10 2007
+diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_linkproof_nhr.pl nagios-snmp-plugins-1.1.1/check_snmp_linkproof_nhr.pl
+--- nagios-snmp-plugins-1.1.1.orig/check_snmp_linkproof_nhr.pl	2006-08-26 14:37:12.000000000 +0200
++++ nagios-snmp-plugins-1.1.1/check_snmp_linkproof_nhr.pl	2008-05-23 14:09:46.000000000 +0200
+@@ -1,4 +1,5 @@
+ #!/usr/bin/perl -w 
++# nagios: -epn
+ ############################## check_snmp_linkproof_nhr #################
+ # Version : 1.0
+ # Date : Aug 24 2006
+diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_load.pl nagios-snmp-plugins-1.1.1/check_snmp_load.pl
+--- nagios-snmp-plugins-1.1.1.orig/check_snmp_load.pl	2008-05-23 14:05:14.000000000 +0200
++++ nagios-snmp-plugins-1.1.1/check_snmp_load.pl	2008-05-23 14:09:52.000000000 +0200
+@@ -1,4 +1,5 @@
+ #!/usr/bin/perl -w 
++# nagios: -epn
+ ############################## check_snmp_load #################
+ my $Version='1.12';
+ # Date : Oct 12 2007
+diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_mem.pl nagios-snmp-plugins-1.1.1/check_snmp_mem.pl
+--- nagios-snmp-plugins-1.1.1.orig/check_snmp_mem.pl	2006-07-09 22:52:37.000000000 +0200
++++ nagios-snmp-plugins-1.1.1/check_snmp_mem.pl	2008-05-23 14:09:58.000000000 +0200
+@@ -1,4 +1,5 @@
+ #!/usr/bin/perl -w 
++# nagios: -epn
+ ############################## check_snmp_mem ##############
+ # Version : 1.1
+ # Date : Jul 09 2006
+diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_nsbox.pl nagios-snmp-plugins-1.1.1/check_snmp_nsbox.pl
+--- nagios-snmp-plugins-1.1.1.orig/check_snmp_nsbox.pl	2007-01-16 23:55:21.000000000 +0100
++++ nagios-snmp-plugins-1.1.1/check_snmp_nsbox.pl	2008-05-23 14:10:04.000000000 +0200
+@@ -1,4 +1,5 @@
+ #!/usr/bin/perl -w 
++# nagios: -epn
+ ############################## check_snmp_nsbox #################
+ # Version : 1.0
+ # Date : Jan 16 2007
+diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_process.pl nagios-snmp-plugins-1.1.1/check_snmp_process.pl
+--- nagios-snmp-plugins-1.1.1.orig/check_snmp_process.pl	2008-05-23 14:05:14.000000000 +0200
++++ nagios-snmp-plugins-1.1.1/check_snmp_process.pl	2008-05-23 14:10:10.000000000 +0200
+@@ -1,4 +1,5 @@
+ #!/usr/bin/perl -w
++# nagios: -epn
+ ############################## check_snmp_process ##############
+ my $Version='1.10';
+ # Date : Oct 12 2007
+diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_storage.pl nagios-snmp-plugins-1.1.1/check_snmp_storage.pl
+--- nagios-snmp-plugins-1.1.1.orig/check_snmp_storage.pl	2008-05-23 14:05:14.000000000 +0200
++++ nagios-snmp-plugins-1.1.1/check_snmp_storage.pl	2008-05-23 14:10:15.000000000 +0200
+@@ -1,4 +1,5 @@
+ #!/usr/bin/perl -w
++# nagios: -epn
+ ############################## check_snmp_storage ##############
+ # Version : 1.3.3
+ # Date :  Jun 1 2007
+diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_vrrp.pl nagios-snmp-plugins-1.1.1/check_snmp_vrrp.pl
+--- nagios-snmp-plugins-1.1.1.orig/check_snmp_vrrp.pl	2006-08-23 23:39:48.000000000 +0200
++++ nagios-snmp-plugins-1.1.1/check_snmp_vrrp.pl	2008-05-23 14:10:21.000000000 +0200
+@@ -1,4 +1,5 @@
+ #!/usr/bin/perl -w 
++# nagios: -epn
+ ############################## check_snmp_vrrp ##############
+ # Version : 1.3
+ # Date : Aug 23 2006
+diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_win.pl nagios-snmp-plugins-1.1.1/check_snmp_win.pl
+--- nagios-snmp-plugins-1.1.1.orig/check_snmp_win.pl	2008-05-23 14:05:14.000000000 +0200
++++ nagios-snmp-plugins-1.1.1/check_snmp_win.pl	2008-05-23 14:10:26.000000000 +0200
+@@ -1,4 +1,5 @@
+ #!/usr/bin/perl -w
++# nagios: -epn
+ ############################## check_snmp_win ##############
+ my $Version='1.1';
+ # Date : Oct 12 2007
