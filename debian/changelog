@@ -1,6 +1,8 @@
 nagios-snmp-plugins (1.1.1-4) UNRELEASED; urgency=low
 
-  * adjust copyright, it's GPL2 (and not later) 
+  * adjust copyright, it's GPL2 (and not later)
+  * update some scripts to newest available version from website
+  * patch plugins with epn header to not use EPN when it's available
 
  -- Jan Wagner <waja@cyconet.org>  Thu, 24 Apr 2008 01:55:58 +0200
 

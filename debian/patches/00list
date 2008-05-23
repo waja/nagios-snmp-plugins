@@ -4,4 +4,4 @@
 04_check_snmp_process.dpatch
 05_check_snmp_storage.dpatch
 06_check_snmp_win.dpatch
-99_disable_epn.dpatch
+50_disable_epn.dpatch
