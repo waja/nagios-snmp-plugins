@@ -3,6 +3,7 @@ nagios-snmp-plugins (1.1.1-4) UNRELEASED; urgency=low
   * adjust copyright, it's GPL2 (and not later)
   * update some scripts to newest available version from website
   * rename 02_disable_epn.dpatch to 50_disable_epn.dpatch to be the last one
+    (Closes: #484462)
 
  -- Jan Wagner <waja@cyconet.org>  Thu, 24 Apr 2008 01:55:58 +0200
 
