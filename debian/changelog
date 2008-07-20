@@ -1,3 +1,9 @@
+nagios-snmp-plugins (1.1.1-6) UNRELEASED; urgency=low
+
+  * NOT RELEASED YET
+
+ -- Jan Wagner <waja@cyconet.org>  Sun, 20 Jul 2008 15:47:37 +0200
+
 nagios-snmp-plugins (1.1.1-5) unstable; urgency=low
 
   * implement machine-interpretable copyright file
