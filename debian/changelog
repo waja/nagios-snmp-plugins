@@ -1,8 +1,11 @@
-nagios-snmp-plugins (1.1.1-6) UNRELEASED; urgency=low
+nagios-snmp-plugins (1.1.1-6) unstable; urgency=low
 
-  * NOT RELEASED YET
+  * instead of suggest depend on nagios-plugins-basic to get command
+    definitions installed into /etc/nagios-plugins/config and registered via
+    ucf, since /usr/share/nagios-plugins/dpkg/functions is used in postinst
+    (Closes: #513872)
 
- -- Jan Wagner <waja@cyconet.org>  Sun, 20 Jul 2008 15:47:37 +0200
+ -- Jan Wagner <waja@cyconet.org>  Sun, 01 Feb 2009 23:49:10 +0100
 
 nagios-snmp-plugins (1.1.1-5) unstable; urgency=low
 
