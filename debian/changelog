@@ -1,6 +1,7 @@
 nagios-snmp-plugins (1.1.1-7) UNRELEASED; urgency=low
 
   * add "Copyright" to all copyrights in debian/copyright
+  * Bump Standards-Version to 3.8.2, no changes needed
 
  -- Jan Wagner <waja@cyconet.org>  Tue, 03 Feb 2009 00:15:20 +0100
 
