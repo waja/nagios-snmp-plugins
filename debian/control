@@ -6,7 +6,7 @@ Uploaders: Jan Wagner <waja@cyconet.org>
 Build-Depends: debhelper (>= 5), dpatch
 Homepage: http://www.manubulon.com/nagios/index_snmp.html
 Vcs-Browser: http://svn.debian.org/wsvn/pkg-nagios/nagios-snmp-plugins/
-Vcs-Svn: svn://svn.debian.org/pkg-nagios/nagios-snmp-plugins/
+Vcs-Svn: svn://svn.debian.org/pkg-nagios/nagios-snmp-plugins/trunk/
 Standards-Version: 3.8.4
 
 Package: nagios-snmp-plugins

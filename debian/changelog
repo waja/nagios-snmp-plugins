@@ -4,6 +4,7 @@ nagios-snmp-plugins (1.1.1-7) UNRELEASED; urgency=low
   * Updating standards version to 3.8.4
     - Add README.source
   * Add 1.0 to debian/source/format
+  * Add trailing trunk/ at Vcs-Svn-field
 
  -- Jan Wagner <waja@cyconet.org>  Tue, 03 Feb 2009 00:15:20 +0100
 
