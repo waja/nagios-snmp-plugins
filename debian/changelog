@@ -1,8 +1,9 @@
-nagios-snmp-plugins (1.1.1-8) UNRELEASED; urgency=low
+nagios-snmp-plugins (1.1.1-8) unstable; urgency=low
 
-  * NOT RELEASED YET
+  * Add 10_fix_net_snmp_version.dpatch
+    - Fixing Net::SNMP version (Closes: #699413)
 
- -- Jan Wagner <waja@cyconet.org>  Wed, 10 Mar 2010 10:22:25 +0100
+ -- Jan Wagner <waja@cyconet.org>  Thu, 31 Jan 2013 08:56:00 +0100
 
 nagios-snmp-plugins (1.1.1-7) unstable; urgency=low
 

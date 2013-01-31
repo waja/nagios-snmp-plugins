@@ -1,0 +1,451 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 10_fix_net_snmp_version.dpatch by Jan Wagner <waja@cyconet.org>
+##
+## DP: Fixing Net::SNMP version
+## DP: (see https://wiki.icinga.org/display/howtos/check_snmp#checksnmp-Argumentv601isntnumericinnumericlt)
+
+@DPATCH@
+diff -urNad '--exclude=CVS' '--exclude=.svn' '--exclude=.git' '--exclude=.arch' '--exclude=.hg' '--exclude=_darcs' '--exclude=.bzr' nagios-snmp-plugins-1.1.1~/check_snmp_boostedge.pl nagios-snmp-plugins-1.1.1/check_snmp_boostedge.pl
+--- nagios-snmp-plugins-1.1.1~/check_snmp_boostedge.pl	2007-01-16 23:57:14.000000000 +0100
++++ nagios-snmp-plugins-1.1.1/check_snmp_boostedge.pl	2013-01-31 08:38:55.000000000 +0100
+@@ -249,7 +249,7 @@
+ 
+ # Get global status
+ my @oidlist=($be_global_status);
+-my $resultat = (Net::SNMP->VERSION < 4) ?
++my $resultat = (Net::SNMP->VERSION lt 4) ?
+           $session->get_request(@oidlist)
+         : $session->get_request(-varbindlist => \@oidlist);
+ 
+@@ -266,7 +266,7 @@
+ 
+ $resultat=undef;
+ # Get service  table
+-$resultat = (Net::SNMP->VERSION < 4) ? 
++$resultat = (Net::SNMP->VERSION lt 4) ? 
+ 		  $session->get_table($be_service_table)
+ 		: $session->get_table(Baseoid => $be_service_table); 
+ 		
+diff -urNad '--exclude=CVS' '--exclude=.svn' '--exclude=.git' '--exclude=.arch' '--exclude=.hg' '--exclude=_darcs' '--exclude=.bzr' nagios-snmp-plugins-1.1.1~/check_snmp_css.pl nagios-snmp-plugins-1.1.1/check_snmp_css.pl
+--- nagios-snmp-plugins-1.1.1~/check_snmp_css.pl	2007-01-11 17:06:08.000000000 +0100
++++ nagios-snmp-plugins-1.1.1/check_snmp_css.pl	2013-01-31 08:38:55.000000000 +0100
+@@ -356,7 +356,7 @@
+ 	}
+ 	close (FILE);
+ } else {
+-	$resultat = (Net::SNMP->VERSION < 4) ? 
++	$resultat = (Net::SNMP->VERSION lt 4) ? 
+ 			  $session->get_table($css_svc_name)
+ 			: $session->get_table(Baseoid => $css_svc_name); 
+ 			
+@@ -392,7 +392,7 @@
+ }
+ 
+ $resultat = undef;
+-$resultat = (Net::SNMP->VERSION < 4) ?
++$resultat = (Net::SNMP->VERSION lt 4) ?
+           $session->get_request(@oid_list)
+         : $session->get_request(-varbindlist => \@oid_list);
+ 
+@@ -402,7 +402,7 @@
+    exit $ERRORS{"UNKNOWN"};
+ }
+ my $resultat2 = undef;
+-$resultat2 = (Net::SNMP->VERSION < 4) ?
++$resultat2 = (Net::SNMP->VERSION lt 4) ?
+           $session->get_request(@oid_list2)
+         : $session->get_request(-varbindlist => \@oid_list2);
+ 
+diff -urNad '--exclude=CVS' '--exclude=.svn' '--exclude=.git' '--exclude=.arch' '--exclude=.hg' '--exclude=_darcs' '--exclude=.bzr' nagios-snmp-plugins-1.1.1~/check_snmp_css_main.pl nagios-snmp-plugins-1.1.1/check_snmp_css_main.pl
+--- nagios-snmp-plugins-1.1.1~/check_snmp_css_main.pl	2006-10-05 23:40:55.000000000 +0200
++++ nagios-snmp-plugins-1.1.1/check_snmp_css_main.pl	2013-01-31 08:38:55.000000000 +0100
+@@ -219,7 +219,7 @@
+ ########### Cisco CSS checks ##############
+ 
+ # Get load table
+-my $resultat = (Net::SNMP->VERSION < 4) ? 
++my $resultat = (Net::SNMP->VERSION lt 4) ? 
+ 		  $session->get_table($css_svc_name)
+ 		: $session->get_table(Baseoid => $css_svc_name); 
+ 		
+diff -urNad '--exclude=CVS' '--exclude=.svn' '--exclude=.git' '--exclude=.arch' '--exclude=.hg' '--exclude=_darcs' '--exclude=.bzr' nagios-snmp-plugins-1.1.1~/check_snmp_env.pl nagios-snmp-plugins-1.1.1/check_snmp_env.pl
+--- nagios-snmp-plugins-1.1.1~/check_snmp_env.pl	2013-01-31 08:37:55.000000000 +0100
++++ nagios-snmp-plugins-1.1.1/check_snmp_env.pl	2013-01-31 08:38:55.000000000 +0100
+@@ -390,7 +390,7 @@
+ verb("Checking cisco env");
+ 
+ # Get load table
+-my $resultat = (Net::SNMP->VERSION < 4) ? 
++my $resultat = (Net::SNMP->VERSION lt 4) ? 
+ 		  $session->get_table($ciscoEnvMonMIB)
+ 		: $session->get_table(Baseoid => $ciscoEnvMonMIB); 
+ 		
+@@ -594,7 +594,7 @@
+ my $global_status=0;
+ my $output="";
+ # get temp
+-$resultat = (Net::SNMP->VERSION < 4) ? 
++$resultat = (Net::SNMP->VERSION lt 4) ? 
+ 		  $session->get_table($nokia_temp_tbl)
+ 		: $session->get_table(Baseoid => $nokia_temp_tbl); 
+ if (defined($resultat)) {
+@@ -609,7 +609,7 @@
+ }
+ 		
+ # Get fan table
+-$resultat = (Net::SNMP->VERSION < 4) ? 
++$resultat = (Net::SNMP->VERSION lt 4) ? 
+ 		  $session->get_table($nokia_fan_table)
+ 		: $session->get_table(Baseoid => $nokia_fan_table); 
+ 		
+@@ -631,7 +631,7 @@
+ }
+ 
+ # Get ps table
+-$resultat = (Net::SNMP->VERSION < 4) ? 
++$resultat = (Net::SNMP->VERSION lt 4) ? 
+ 		  $session->get_table($nokia_ps_table)
+ 		: $session->get_table(Baseoid => $nokia_ps_table); 
+ 		
+@@ -697,7 +697,7 @@
+ 
+ 
+ 	# get sensor table
+-	$resultat = (Net::SNMP->VERSION < 4) ? 
++	$resultat = (Net::SNMP->VERSION lt 4) ? 
+ 			  $session->get_table($bc_sensor_table)
+ 			: $session->get_table(Baseoid => $bc_sensor_table); 
+ 	if (defined($resultat)) {
+@@ -740,7 +740,7 @@
+ 	}
+ 			
+ 	# Get disk table
+-	$resultat = (Net::SNMP->VERSION < 4) ? 
++	$resultat = (Net::SNMP->VERSION lt 4) ? 
+ 			  $session->get_table($bc_dsk_table)
+ 			: $session->get_table(Baseoid => $bc_dsk_table); 
+ 			
+@@ -811,7 +811,7 @@
+ # get temp if $o_temp is defined
+ if (defined($o_temp)) {
+   verb("Checking temp < $o_temp");
+-  $resultat = (Net::SNMP->VERSION < 4) ? 
++  $resultat = (Net::SNMP->VERSION lt 4) ? 
+ 		  $session->get_table($iron_tmp_table)
+ 		: $session->get_table(Baseoid => $iron_tmp_table); 
+   if (defined($resultat)) {
+@@ -843,7 +843,7 @@
+ # Get fan status if $o_fan is defined
+ if (defined($o_fan)) {
+   verb("Checking fan > $o_fan");
+-  $resultat = (Net::SNMP->VERSION < 4) ?
++  $resultat = (Net::SNMP->VERSION lt 4) ?
+                   $session->get_table($iron_fan_table)
+                 : $session->get_table(Baseoid => $iron_fan_table);
+   if (defined($resultat)) {
+@@ -874,7 +874,7 @@
+ 
+ # Get power supply status
+   verb("Checking PS");
+-  $resultat = (Net::SNMP->VERSION < 4) ?
++  $resultat = (Net::SNMP->VERSION lt 4) ?
+                   $session->get_table($iron_ps_table)
+                 : $session->get_table(Baseoid => $iron_ps_table);
+   if (defined($resultat)) {
+@@ -966,7 +966,7 @@
+ 
+ # Get PS table (TODO : Bug in FAN table, see with Foundry).
+ 
+-my $result_ps = (Net::SNMP->VERSION < 4) ? 
++my $result_ps = (Net::SNMP->VERSION lt 4) ? 
+                     $session->get_table($foundry_ps_table)
+                   : $session->get_table(Baseoid => $foundry_ps_table);
+ 
+diff -urNad '--exclude=CVS' '--exclude=.svn' '--exclude=.git' '--exclude=.arch' '--exclude=.hg' '--exclude=_darcs' '--exclude=.bzr' nagios-snmp-plugins-1.1.1~/check_snmp_linkproof_nhr.pl nagios-snmp-plugins-1.1.1/check_snmp_linkproof_nhr.pl
+--- nagios-snmp-plugins-1.1.1~/check_snmp_linkproof_nhr.pl	2006-08-26 14:37:12.000000000 +0200
++++ nagios-snmp-plugins-1.1.1/check_snmp_linkproof_nhr.pl	2013-01-31 08:38:56.000000000 +0100
+@@ -232,7 +232,7 @@
+ my $global_status=0;
+ 
+ # Get load table
+-my $resultat = (Net::SNMP->VERSION < 4) ? 
++my $resultat = (Net::SNMP->VERSION lt 4) ? 
+ 		  $session->get_table($lp_type)
+ 		: $session->get_table(Baseoid => $lp_type); 
+ 		
+@@ -261,7 +261,7 @@
+ }
+ 
+ my $result=undef;
+-if (Net::SNMP->VERSION < 4) {
++if (Net::SNMP->VERSION lt 4) {
+   $result = $session->get_request(@oids);
+ } else {
+   if ($session->version == 0) { 
+diff -urNad '--exclude=CVS' '--exclude=.svn' '--exclude=.git' '--exclude=.arch' '--exclude=.hg' '--exclude=_darcs' '--exclude=.bzr' nagios-snmp-plugins-1.1.1~/check_snmp_load.pl nagios-snmp-plugins-1.1.1/check_snmp_load.pl
+--- nagios-snmp-plugins-1.1.1~/check_snmp_load.pl	2013-01-31 08:37:55.000000000 +0100
++++ nagios-snmp-plugins-1.1.1/check_snmp_load.pl	2013-01-31 08:38:56.000000000 +0100
+@@ -346,7 +346,7 @@
+ 
+ verb("Checking linux load");
+ # Get load table
+-my $resultat = (Net::SNMP->VERSION < 4) ? 
++my $resultat = (Net::SNMP->VERSION lt 4) ? 
+ 		  $session->get_table($linload_table)
+ 		: $session->get_table(Baseoid => $linload_table); 
+ 		
+@@ -410,7 +410,7 @@
+ 
+ if ($o_check_type eq "cisco") {
+ my @oidlists = ($cisco_cpu_5m, $cisco_cpu_1m, $cisco_cpu_5s);
+-my $resultat = (Net::SNMP->VERSION < 4) ?
++my $resultat = (Net::SNMP->VERSION lt 4) ?
+ 	  $session->get_request(@oidlists)
+ 	: $session->get_request(-varbindlist => \@oidlists);
+ 
+@@ -465,7 +465,7 @@
+ 
+ if ($o_check_type eq "cata") {
+ my @oidlists = ($ciscocata_cpu_5m, $ciscocata_cpu_1m, $ciscocata_cpu_5s);
+-my $resultat = (Net::SNMP->VERSION < 4) ?
++my $resultat = (Net::SNMP->VERSION lt 4) ?
+ 	  $session->get_request(@oidlists)
+ 	: $session->get_request(-varbindlist => \@oidlists);
+ 
+@@ -520,7 +520,7 @@
+ 
+ if ($o_check_type eq "nsc") {
+ my @oidlists = ($nsc_cpu_5m, $nsc_cpu_1m, $nsc_cpu_5s);
+-my $resultat = (Net::SNMP->VERSION < 4) ?
++my $resultat = (Net::SNMP->VERSION lt 4) ?
+ 	  $session->get_request(@oidlists)
+ 	: $session->get_request(-varbindlist => \@oidlists);
+ 
+@@ -577,7 +577,7 @@
+ # Get load table
+ my @oidlist = $cpu_oid{$o_check_type}; 
+ verb("Checking OID : @oidlist");
+-my $resultat = (Net::SNMP->VERSION < 4) ? 
++my $resultat = (Net::SNMP->VERSION lt 4) ? 
+ 	  $session->get_request(@oidlist)
+ 	: $session->get_request(-varbindlist => \@oidlist);
+ if (!defined($resultat)) {
+@@ -625,7 +625,7 @@
+ verb("Checking hpux load");
+ 
+ my @oidlists = ($hpux_load_1_min, $hpux_load_5_min, $hpux_load_15_min);
+-my $resultat = (Net::SNMP->VERSION < 4) ?
++my $resultat = (Net::SNMP->VERSION lt 4) ?
+ 	  $session->get_request(@oidlists)
+ 	: $session->get_request(-varbindlist => \@oidlists);
+ 
+@@ -678,7 +678,7 @@
+ 
+ ########## Standard cpu usage check ############
+ # Get desctiption table
+-my $resultat =  (Net::SNMP->VERSION < 4) ?
++my $resultat =  (Net::SNMP->VERSION lt 4) ?
+ 	  $session->get_table($base_proc)
+ 	: $session->get_table(Baseoid => $base_proc);
+ 
+diff -urNad '--exclude=CVS' '--exclude=.svn' '--exclude=.git' '--exclude=.arch' '--exclude=.hg' '--exclude=_darcs' '--exclude=.bzr' nagios-snmp-plugins-1.1.1~/check_snmp_mem.pl nagios-snmp-plugins-1.1.1/check_snmp_mem.pl
+--- nagios-snmp-plugins-1.1.1~/check_snmp_mem.pl	2006-07-09 22:52:37.000000000 +0200
++++ nagios-snmp-plugins-1.1.1/check_snmp_mem.pl	2013-01-31 08:38:56.000000000 +0100
+@@ -316,7 +316,7 @@
+ if (defined ($o_cisco)) {
+ 
+   # Get Cisco memory table
+-  $resultat = (Net::SNMP->VERSION < 4) ?
++  $resultat = (Net::SNMP->VERSION lt 4) ?
+                  $session->get_table($cisco_mem_pool)
+                  :$session->get_table(Baseoid => $cisco_mem_pool);
+   
+@@ -393,7 +393,7 @@
+ if (defined ($o_hp)) {
+ 
+   # Get hp memory table
+-  $resultat = (Net::SNMP->VERSION < 4) ?
++  $resultat = (Net::SNMP->VERSION lt 4) ?
+                  $session->get_table($hp_mem_pool)
+                  :$session->get_table(Baseoid => $hp_mem_pool);
+   
+@@ -462,7 +462,7 @@
+ if (defined ($o_netsnmp)) {
+ 
+   # Get NetSNMP memory values
+-  $resultat = (Net::SNMP->VERSION < 4) ?
++  $resultat = (Net::SNMP->VERSION lt 4) ?
+ 		$session->get_request(@nets_oids)
+ 		:$session->get_request(-varbindlist => \@nets_oids);
+   
+diff -urNad '--exclude=CVS' '--exclude=.svn' '--exclude=.git' '--exclude=.arch' '--exclude=.hg' '--exclude=_darcs' '--exclude=.bzr' nagios-snmp-plugins-1.1.1~/check_snmp_nsbox.pl nagios-snmp-plugins-1.1.1/check_snmp_nsbox.pl
+--- nagios-snmp-plugins-1.1.1~/check_snmp_nsbox.pl	2007-01-16 23:55:21.000000000 +0100
++++ nagios-snmp-plugins-1.1.1/check_snmp_nsbox.pl	2013-01-31 08:38:56.000000000 +0100
+@@ -265,7 +265,7 @@
+ 
+ ########### check global status ##############
+ my @oidlist=($ns_service_status);
+-my $resultat = (Net::SNMP->VERSION < 4) ?
++my $resultat = (Net::SNMP->VERSION lt 4) ?
+           $session->get_request(@oidlist)
+         : $session->get_request(-varbindlist => \@oidlist);
+ 
+@@ -282,7 +282,7 @@
+ 
+ ########### check vhost & diode status ##############
+ $resultat=undef;
+-$resultat = (Net::SNMP->VERSION < 4) ? 
++$resultat = (Net::SNMP->VERSION lt 4) ? 
+ 		  $session->get_table($ns_service_table)
+ 		: $session->get_table(Baseoid => $ns_service_table); 
+ 
+diff -urNad '--exclude=CVS' '--exclude=.svn' '--exclude=.git' '--exclude=.arch' '--exclude=.hg' '--exclude=_darcs' '--exclude=.bzr' nagios-snmp-plugins-1.1.1~/check_snmp_process.pl nagios-snmp-plugins-1.1.1/check_snmp_process.pl
+--- nagios-snmp-plugins-1.1.1~/check_snmp_process.pl	2013-01-31 08:37:55.000000000 +0100
++++ nagios-snmp-plugins-1.1.1/check_snmp_process.pl	2013-01-31 08:38:56.000000000 +0100
+@@ -407,11 +407,11 @@
+ my %result_cons=();
+ my ($getall_run,$getall_cpu,$getall_mem)=(undef,undef,undef);
+ if ( !defined ($o_path) ) {
+-  $resultat = (Net::SNMP->VERSION < 4) ? 
++  $resultat = (Net::SNMP->VERSION lt 4) ? 
+ 		$session->get_table($run_name_table)
+ 		: $session->get_table(Baseoid => $run_name_table);
+ } else {
+-  $resultat = (Net::SNMP->VERSION < 4) ?
++  $resultat = (Net::SNMP->VERSION lt 4) ?
+ 	$session->get_table($run_path_table)
+ 	:$session->get_table(Baseoid => $run_path_table);
+ }
+@@ -424,7 +424,7 @@
+ 
+ my $resultat_param=undef;
+ if (defined($o_param)) { # Get parameter table too
+-    $resultat_param = (Net::SNMP->VERSION < 4) ?
++    $resultat_param = (Net::SNMP->VERSION lt 4) ?
+         $session->get_table($run_param_table)
+         :$session->get_table(Baseoid => $run_param_table);
+    if (!defined($resultat_param)) {
+@@ -436,7 +436,7 @@
+ }
+ 
+ if (defined ($o_get_all)) {
+-  $getall_run = (Net::SNMP->VERSION < 4) ?
++  $getall_run = (Net::SNMP->VERSION lt 4) ?
+ 	$session->get_table($proc_run_state )
+ 	:$session->get_table(Baseoid => $proc_run_state );
+   if (!defined($getall_run)) {
+@@ -447,7 +447,7 @@
+   foreach my $key ( keys %$getall_run) {
+     $result_cons{$key}=$$getall_run{$key};
+   } 
+-  $getall_cpu = (Net::SNMP->VERSION < 4) ?
++  $getall_cpu = (Net::SNMP->VERSION lt 4) ?
+ 	$session->get_table($proc_cpu_table)
+ 	: $session->get_table(Baseoid => $proc_cpu_table);
+   if (!defined($getall_cpu)) {
+@@ -458,7 +458,7 @@
+   foreach my $key ( keys %$getall_cpu) {
+     $result_cons{$key}=$$getall_cpu{$key};
+   } 
+-  $getall_mem = (Net::SNMP->VERSION < 4) ? 
++  $getall_mem = (Net::SNMP->VERSION lt 4) ? 
+ 	$session->get_table($proc_mem_table)
+ 	: $session->get_table(Baseoid => $proc_mem_table);
+   if (!defined($getall_mem)) {
+@@ -539,7 +539,7 @@
+ 	 $toid[$i]=$oids[$i+$tmp_index];
+ 	 #verb("$i :  $toid[$i] : $oids[$i+$tmp_index]");
+       }
+-      $tmp_result = (Net::SNMP->VERSION < 4) ? 
++      $tmp_result = (Net::SNMP->VERSION lt 4) ? 
+ 	    $session->get_request(@toid)
+ 		: $session->get_request(Varbindlist => \@toid);
+       if (!defined($tmp_result)) { printf("ERROR: running table : %s.\n", $session->error); $session->close;
+@@ -551,7 +551,7 @@
+     }  
+ 
+   } else {
+-    $result = (Net::SNMP->VERSION < 4) ? 
++    $result = (Net::SNMP->VERSION lt 4) ? 
+ 		$session->get_request(@oids)
+ 		: $session->get_request(Varbindlist => \@oids);
+     if (!defined($result)) { printf("ERROR: running table : %s.\n", $session->error); $session->close;
+diff -urNad '--exclude=CVS' '--exclude=.svn' '--exclude=.git' '--exclude=.arch' '--exclude=.hg' '--exclude=_darcs' '--exclude=.bzr' nagios-snmp-plugins-1.1.1~/check_snmp_storage.pl nagios-snmp-plugins-1.1.1/check_snmp_storage.pl
+--- nagios-snmp-plugins-1.1.1~/check_snmp_storage.pl	2013-01-31 08:37:55.000000000 +0100
++++ nagios-snmp-plugins-1.1.1/check_snmp_storage.pl	2013-01-31 08:38:56.000000000 +0100
+@@ -411,13 +411,13 @@
+ # Get rid of UTF8 translation in case of accentuated caracters (thanks to Dimo Velev).
+ $session->translate(Net::SNMP->TRANSLATE_NONE);
+ if (defined ($o_index)){
+-  if (Net::SNMP->VERSION < 4) {
++  if (Net::SNMP->VERSION lt 4) {
+     $resultat = $session->get_table($index_table);
+   } else {
+ 	$resultat = $session->get_table(Baseoid => $index_table);
+   }
+ } else {
+-  if (Net::SNMP->VERSION < 4) {
++  if (Net::SNMP->VERSION lt 4) {
+     $resultat = $session->get_table($descr_table);
+   } else {
+     $resultat = $session->get_table(Baseoid => $descr_table);
+@@ -425,7 +425,7 @@
+ }
+ #get storage typetable for reference
+ if (defined($o_storagetype)){
+-  if (Net::SNMP->VERSION < 4) {
++  if (Net::SNMP->VERSION lt 4) {
+     $stype = $session->get_table($storagetype_table);
+   } else {
+     $stype = $session->get_table(Baseoid => $storagetype_table);
+@@ -491,7 +491,7 @@
+ 
+ my $result=undef;
+ 
+-if (Net::SNMP->VERSION < 4) {
++if (Net::SNMP->VERSION lt 4) {
+   $result = $session->get_request(@oids);
+ } else {
+   if ($session->version == 0) { 
+diff -urNad '--exclude=CVS' '--exclude=.svn' '--exclude=.git' '--exclude=.arch' '--exclude=.hg' '--exclude=_darcs' '--exclude=.bzr' nagios-snmp-plugins-1.1.1~/check_snmp_vrrp.pl nagios-snmp-plugins-1.1.1/check_snmp_vrrp.pl
+--- nagios-snmp-plugins-1.1.1~/check_snmp_vrrp.pl	2006-08-23 23:39:48.000000000 +0200
++++ nagios-snmp-plugins-1.1.1/check_snmp_vrrp.pl	2013-01-31 08:38:56.000000000 +0100
+@@ -306,7 +306,7 @@
+ if ($o_type eq "ipso") {
+ # Get cluster table
+ my $resultat;
+-if (Net::SNMP->VERSION < 4) {
++if (Net::SNMP->VERSION lt 4) {
+   $resultat = $session->get_table( $nokia_clust_table );
+ } else {
+   $resultat = $session->get_table( Baseoid => $nokia_clust_table );
+@@ -364,7 +364,7 @@
+ 
+ # Get vrrp table
+ my $resultat;
+-if (Net::SNMP->VERSION < 4) {
++if (Net::SNMP->VERSION lt 4) {
+   $resultat = $session->get_table( $base_vrrp{$o_type} );
+ } else {
+   $resultat = $session->get_table( Baseoid => $base_vrrp{$o_type} );
+diff -urNad '--exclude=CVS' '--exclude=.svn' '--exclude=.git' '--exclude=.arch' '--exclude=.hg' '--exclude=_darcs' '--exclude=.bzr' nagios-snmp-plugins-1.1.1~/check_snmp_win.pl nagios-snmp-plugins-1.1.1/check_snmp_win.pl
+--- nagios-snmp-plugins-1.1.1~/check_snmp_win.pl	2013-01-31 08:37:55.000000000 +0100
++++ nagios-snmp-plugins-1.1.1/check_snmp_win.pl	2013-01-31 08:38:56.000000000 +0100
+@@ -256,7 +256,7 @@
+ # Look for process in name or path name table
+ my $resultat=undef;
+ 
+-$resultat = (Net::SNMP->VERSION < 4) ? 
++$resultat = (Net::SNMP->VERSION lt 4) ? 
+ 		$session->get_table($win_serv_name)
+ 		: $session->get_table(Baseoid => $win_serv_name);
+ 
+@@ -314,7 +314,7 @@
+ my $result=undef;
+ my $num_int_ok=0;
+ 
+-$result = (Net::SNMP->VERSION < 4) ? 
++$result = (Net::SNMP->VERSION lt 4) ? 
+     $session->get_request(@oids)
+   : $session->get_request(Varbindlist => \@oids);
+ 
