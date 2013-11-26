@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w 
 ############################## check_snmp_load #################
-# Version : 1.3.1
-# Date : 8 Sept 2006
+# Version : 1.3.2
+# Date : Jan 16 2007
 # Author  : Patrick Proy ( patrick at proy.org)
 # Help : http://www.manubulon.com/nagios/
 # Licence : GPL - http://www.fsf.org/licenses/gpl.txt
@@ -94,7 +94,7 @@ my %cpu_oid = ("netsc",$ns_cpu_idle,"as400",$as400_cpu,"bc",$bluecoat_cpu,"nokia
 
 # Globals
 
-my $Version='1.3.1';
+my $Version='1.3.2';
 
 my $o_host = 	undef; 		# hostname
 my $o_community = undef; 	# community
@@ -136,7 +136,7 @@ sub isnnum { # Return true if arg is not a number
 
 sub help {
    print "\nSNMP Load & CPU Monitor for Nagios version ",$Version,"\n";
-   print "GPL licence, (c)2004-2006 Patrick Proy\n\n";
+   print "GPL licence, (c)2004-2007 Patrick Proy\n\n";
    print_usage();
    print <<EOT;
 -v, --verbose
@@ -282,6 +282,11 @@ if (defined($TIMEOUT)) {
   verb("no global timeout defined : $o_timeout + 10");
   alarm ($o_timeout+10);
 }
+
+$SIG{'ALRM'} = sub {
+ print "No answer from host\n";
+ exit $ERRORS{"UNKNOWN"};
+};
 
 # Connect to host
 my ($session,$error);
@@ -450,8 +455,8 @@ for (my $i=0;$i<3;$i++) {
 }
 print " OK" if ($exit_val eq $ERRORS{"OK"});
 if (defined($o_perf)) {
-   print " | load_5_sec=$load[0]%;$o_warnL[0];$o_critL[0],";
-   print "load_1_min=$load[1]%;$o_warnL[1];$o_critL[1],";
+   print " | load_5_sec=$load[0]%;$o_warnL[0];$o_critL[0] ";
+   print "load_1_min=$load[1]%;$o_warnL[1];$o_critL[1] ";
    print "load_5_min=$load[2]%;$o_warnL[2];$o_critL[2]\n";
 } else {
  print "\n";
@@ -505,8 +510,8 @@ for (my $i=0;$i<3;$i++) {
 }
 print " OK" if ($exit_val eq $ERRORS{"OK"});
 if (defined($o_perf)) {
-   print " | load_5_sec=$load[0]%;$o_warnL[0];$o_critL[0],";
-   print "load_1_min=$load[1]%;$o_warnL[1];$o_critL[1],";
+   print " | load_5_sec=$load[0]%;$o_warnL[0];$o_critL[0] ";
+   print "load_1_min=$load[1]%;$o_warnL[1];$o_critL[1] ";
    print "load_5_min=$load[2]%;$o_warnL[2];$o_critL[2]\n";
 } else {
  print "\n";
@@ -560,8 +565,8 @@ for (my $i=0;$i<3;$i++) {
 }
 print " OK" if ($exit_val eq $ERRORS{"OK"});
 if (defined($o_perf)) {
-   print " | cpu_5_sec=$load[0]%;$o_warnL[0];$o_critL[0],";
-   print "cpu_1_min=$load[1]%;$o_warnL[1];$o_critL[1],";
+   print " | cpu_5_sec=$load[0]%;$o_warnL[0];$o_critL[0] ";
+   print "cpu_1_min=$load[1]%;$o_warnL[1];$o_critL[1] ";
    print "cpu_5_min=$load[2]%;$o_warnL[2];$o_critL[2]\n";
 } else {
  print "\n";
@@ -665,8 +670,8 @@ for (my $i=0;$i<3;$i++) {
 }
 print " OK" if ($exit_val eq $ERRORS{"OK"});
 if (defined($o_perf)) {
-   print " | load_1_min=$load[0]%;$o_warnL[0];$o_critL[0],";
-   print "load_5_min=$load[1]%;$o_warnL[1];$o_critL[1],";
+   print " | load_1_min=$load[0]%;$o_warnL[0];$o_critL[0] ";
+   print "load_5_min=$load[1]%;$o_warnL[1];$o_critL[1] ";
    print "load_15_min=$load[2]%;$o_warnL[2];$o_critL[2]\n";
 } else {
  print "\n";
@@ -706,19 +711,19 @@ if ($ncpu==0) {
 $cpu_used /= $ncpu;
 
 print "$ncpu CPU, ", $ncpu==1 ? "load" : "average load";
-printf(" %.1f",$cpu_used);
+printf(" %.1f%%",$cpu_used);
 $exit_val=$ERRORS{"OK"};
 
 if ($cpu_used > $o_crit) {
- print " > $o_crit : CRITICAL";
+ print " > $o_crit% : CRITICAL";
  $exit_val=$ERRORS{"CRITICAL"};
 } else {
   if ($cpu_used > $o_warn) {
-   print " > $o_warn : WARNING";
+   print " > $o_warn% : WARNING";
    $exit_val=$ERRORS{"WARNING"};
   }
 }
-print " < $o_warn : OK" if ($exit_val eq $ERRORS{"OK"});
+print " < $o_warn% : OK" if ($exit_val eq $ERRORS{"OK"});
 (defined($o_perf)) ?
    print " | cpu_prct_used=$cpu_used%;$o_warn;$o_crit\n"
  : print "\n";
