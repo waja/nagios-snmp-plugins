@@ -5,4 +5,5 @@
 05_check_snmp_storage.dpatch
 06_check_snmp_win.dpatch
 10_fix_net_snmp_version.dpatch
+15_check_snmp_storage_64bit.dpatch
 50_disable_epn.dpatch
