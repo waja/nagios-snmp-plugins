@@ -50,7 +50,7 @@ nagios-snmp-plugins for Debian
 
    define command {
 	command_name check_snmp_cpfw_v3
-	command_line $USER1$/check_snmp_cpfw.pl -H $HOSTADDRESS$ $USER8$
+	command_line /usr/lib/nagios/plugins/check_snmp_cpfw.pl -H $HOSTADDRESS$ $USER8$
 	$ARG1$
    }
 
@@ -64,13 +64,13 @@ nagios-snmp-plugins for Debian
 
    define command {
 	command_name check_snmp_load_v1
-	command_line $USER1$/check_snmp_load.pl -H $HOSTADDRESS$ $USER7$ -T
+	command_line /usr/lib/nagios/plugins/check_snmp_load.pl -H $HOSTADDRESS$ $USER7$ -T
    $ARG1$ -w $ARG2$ -c $ARG3$ $ARG4$
    }
 
    define command {
 	command_name check_snmp_load_v3
-	command_line $USER1$/check_snmp_load.pl -H $HOSTADDRESS$ $USER8$ -T
+	command_line /usr/lib/nagios/plugins/check_snmp_load.pl -H $HOSTADDRESS$ $USER8$ -T
    $ARG1$ -w $ARG2$ -c $ARG3$ $ARG4$
    }
 
@@ -98,13 +98,13 @@ nagios-snmp-plugins for Debian
 
    define command {
 	command_name check_snmp_int_v1
-	command_line $USER1$/check_snmp_int.pl -H $HOSTADDRESS$ $USER7$ -n
+	command_line /usr/lib/nagios/plugins/check_snmp_int.pl -H $HOSTADDRESS$ $USER7$ -n
    $ARG1$ $ARG2$
    }
 
    define command{
 	command_name check_snmp_int_v3
-	command_line $USER1$/check_snmp_int.pl -H $HOSTADDRESS$ $USER8$ -n
+	command_line /usr/lib/nagios/plugins/check_snmp_int.pl -H $HOSTADDRESS$ $USER8$ -n
    $ARG1$ $ARG2$
    }
 
@@ -122,13 +122,13 @@ nagios-snmp-plugins for Debian
 
    define command {
 	command_name check_snmp_mem_v1
-	command_line $USER1$/check_snmp_mem.pl -H $HOSTADDRESS$ $USER7$ $ARG1$
+	command_line /usr/lib/nagios/plugins/check_snmp_mem.pl -H $HOSTADDRESS$ $USER7$ $ARG1$
    -w $ARG2$ -c $ARG3$ $ARG4$
    }
 
    define command {
 	command_name check_snmp_mem_v3
-	command_line $USER1$/check_snmp_mem.pl -H $HOSTADDRESS$ $USER8$ $ARG1$
+	command_line /usr/lib/nagios/plugins/check_snmp_mem.pl -H $HOSTADDRESS$ $USER8$ $ARG1$
    -w $ARG2$ -c $ARG3$ $ARG4$
    }
 
@@ -146,7 +146,7 @@ nagios-snmp-plugins for Debian
 
    define command {
 	command_name check_snmp_process_v1
-	command_line $USER1$/check_snmp_process.pl -H $HOSTADDRESS$ $USER7$ -n
+	command_line /usr/lib/nagios/plugins/check_snmp_process.pl -H $HOSTADDRESS$ $USER7$ -n
    $ARG1$ -w $ARG2$ -c $ARG3$ $ARG4$
    }
 
@@ -170,13 +170,13 @@ nagios-snmp-plugins for Debian
 
    define command {
 	command_name check_snmp_storage_v1
-	command_line $USER1$/check_snmp_storage.pl -H $HOSTADDRESS$ $USER7$ -m
+	command_line /usr/lib/nagios/plugins/check_snmp_storage.pl -H $HOSTADDRESS$ $USER7$ -m
    $ARG1$ -w $ARG2$ -c $ARG3$ $ARG4$
    }
 
    define command {
 	command_name check_snmp_storage_v3
-	command_line $USER1$/check_snmp_storage.pl -H $HOSTADDRESS$ $USER8$ -m
+	command_line /usr/lib/nagios/plugins/check_snmp_storage.pl -H $HOSTADDRESS$ $USER8$ -m
    $ARG1$ -w $ARG2$ -c $ARG3$ $ARG4$
    }
 
@@ -208,13 +208,13 @@ nagios-snmp-plugins for Debian
 
    define command {
 	command_name check_snmp_vrrp_v1
-	command_line $USER1$/check_snmp_vrrp.pl -H $HOSTADDRESS$ $USER7$ -T
+	command_line /usr/lib/nagios/plugins/check_snmp_vrrp.pl -H $HOSTADDRESS$ $USER7$ -T
    $ARG1$ -s $ARG2$
    }
 
    define command {
 	command_name check_snmp_vrrp_v3
-	command_line $USER1$/check_snmp_vrrp.pl -H $HOSTADDRESS$ $USER8$ -T
+	command_line /usr/lib/nagios/plugins/check_snmp_vrrp.pl -H $HOSTADDRESS$ $USER8$ -T
    $ARG1$ -s $ARG2$
    }
 
@@ -239,7 +239,7 @@ nagios-snmp-plugins for Debian
 
    define command {
 	command_name check_win
-	command_line $USER1$/check_snmp_win.pl -H $HOSTADDRESS$ $USER7$ -n
+	command_line /usr/lib/nagios/plugins/check_snmp_win.pl -H $HOSTADDRESS$ $USER7$ -n
    $ARG2$
    # comment community service(s) name
    }
