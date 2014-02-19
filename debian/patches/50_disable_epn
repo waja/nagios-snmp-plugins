@@ -1,9 +1,6 @@
-#!/bin/sh /usr/share/dpatch/dpatch-run
-## 50_disable_epn.dpatch by Jan Wagner <waja@cyconet.org>
+## 50_disable_epn by Jan Wagner <waja@cyconet.org>
 ##
 ## DP: leave marks to disable epn
-
-@DPATCH@
 
 diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_boostedge.pl nagios-snmp-plugins-1.1.1/check_snmp_boostedge.pl
 --- nagios-snmp-plugins-1.1.1.orig/check_snmp_boostedge.pl	2007-01-16 23:57:14.000000000 +0100

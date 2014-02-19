@@ -1,9 +1,0 @@
-01_check_snmp_env.dpatch
-02_check_snmp_int.dpatch
-03_check_snmp_load.dpatch
-04_check_snmp_process.dpatch
-05_check_snmp_storage.dpatch
-06_check_snmp_win.dpatch
-10_fix_net_snmp_version.dpatch
-15_check_snmp_storage_64bit.dpatch
-50_disable_epn.dpatch

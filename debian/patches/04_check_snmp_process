@@ -1,9 +1,6 @@
-#!/bin/sh /usr/share/dpatch/dpatch-run
-## 04_check_snmp_process.dpatch by Jan Wagner <waja@cyconet.org>
+## 04_check_snmp_process by Jan Wagner <waja@cyconet.org>
 ##
 ## DP: Update script to version 1.10
-
-@DPATCH@
 
 diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_process.pl nagios-snmp-plugins-1.1.1/check_snmp_process.pl
 --- nagios-snmp-plugins-1.1.1.orig/check_snmp_process.pl	2007-03-12 21:36:02.000000000 +0100

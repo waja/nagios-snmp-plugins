@@ -1,9 +1,6 @@
-#!/bin/sh /usr/share/dpatch/dpatch-run
-## 02_check_snmp_int.dpatch by Jan Wagner <waja@cyconet.org>
+## 02_check_snmp_int by Jan Wagner <waja@cyconet.org>
 ##
 ## DP: Update script to version 1.24
-
-@DPATCH@
 
 
 diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_int.pl nagios-snmp-plugins-1.1.1/check_snmp_int.pl

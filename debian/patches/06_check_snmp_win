@@ -1,9 +1,6 @@
-#!/bin/sh /usr/share/dpatch/dpatch-run
-## 06_check_snmp_win.dpatch by Jan Wagner <waja@cyconet.org>
+## 06_check_snmp_win by Jan Wagner <waja@cyconet.org>
 ##
 ## DP: Update script to version 1.1 
-
-@DPATCH@
 
 diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_win.pl nagios-snmp-plugins-1.1.1/check_snmp_win.pl
 --- nagios-snmp-plugins-1.1.1.orig/check_snmp_win.pl	2006-11-29 20:59:55.000000000 +0100
