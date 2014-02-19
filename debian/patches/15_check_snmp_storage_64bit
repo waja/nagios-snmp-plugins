@@ -1,10 +1,8 @@
-#! /bin/sh /usr/share/dpatch/dpatch-run
 ## 15_check_snmp_storage_64bit by Martin Fürstenau
 ##
 ## DP: Fixing Net::SNMP version
 ## DP: (see https://wiki.icinga.org/display/howtos/check_snmp#checksnmp-Argumentv601isntnumericinnumericlt)
 
-## @DPATCH@
 ## From 144c57a0adda190000bef500f3274425cb90d6ba Mon Sep 17 00:00:00 2001
 ## From: Michael Friedrich <michael.friedrich@gmail.com>
 ## Date: Wed, 26 Sep 2012 16:32:40 +0200
@@ -18,8 +16,6 @@
 ---
  plugins/check_snmp_storage.pl | 54 ++++++++++++++++++++++++++++---------------
  1 file changed, 36 insertions(+), 18 deletions(-)
-
-@DPATCH@
 
 diff --git a/plugins/check_snmp_storage.pl b/plugins/check_snmp_storage.pl
 index 1b8a398..a3c784f 100644

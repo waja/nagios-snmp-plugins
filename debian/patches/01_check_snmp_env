@@ -1,9 +1,6 @@
-#!/bin/sh /usr/share/dpatch/dpatch-run
-## 01_check_snmp_env.dpatch by Jan Wagner <waja@cyconet.org>
+## 01_check_snmp_env by Jan Wagner <waja@cyconet.org>
 ##
 ## DP: Fix some issues via cvs version
-
-@DPATCH@
 
 --- old/check_snmp_env.pl	2007-07-04 09:46:55.000000000 +0200
 +++ new/check_snmp_env.pl	2007-07-06 22:17:06.000000000 +0200

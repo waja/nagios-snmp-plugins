@@ -1,9 +1,6 @@
-#!/bin/sh /usr/share/dpatch/dpatch-run
-## 03_check_snmp_load.dpatch by Jan Wagner <waja@cyconet.org>
+## 03_check_snmp_load by Jan Wagner <waja@cyconet.org>
 ##
 ## DP: Update script to version 1.12
-
-@DPATCH@
 
 diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_load.pl nagios-snmp-plugins-1.1.1/check_snmp_load.pl
 --- nagios-snmp-plugins-1.1.1.orig/check_snmp_load.pl	2007-04-16 19:41:20.000000000 +0200

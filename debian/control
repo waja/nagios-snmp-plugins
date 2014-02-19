@@ -3,7 +3,7 @@ Section: net
 Priority: optional
 Maintainer: Debian Nagios Maintainer Group <pkg-nagios-devel@lists.alioth.debian.org>
 Uploaders: Jan Wagner <waja@cyconet.org>
-Build-Depends: debhelper (>= 5), dpatch
+Build-Depends: debhelper (>= 5)
 Homepage: http://www.manubulon.com/nagios/index_snmp.html
 Vcs-Browser: http://git.debian.org/?p=pkg-nagios/pkg-nagios-snmp-plugins.git
 Vcs-Git: git://git.debian.org/pkg-nagios/pkg-nagios-snmp-plugins

@@ -1,10 +1,8 @@
-#! /bin/sh /usr/share/dpatch/dpatch-run
-## 10_fix_net_snmp_version.dpatch by Jan Wagner <waja@cyconet.org>
+## 10_fix_net_snmp_version by Jan Wagner <waja@cyconet.org>
 ##
 ## DP: Fixing Net::SNMP version
 ## DP: (see https://wiki.icinga.org/display/howtos/check_snmp#checksnmp-Argumentv601isntnumericinnumericlt)
 
-@DPATCH@
 diff -urNad '--exclude=CVS' '--exclude=.svn' '--exclude=.git' '--exclude=.arch' '--exclude=.hg' '--exclude=_darcs' '--exclude=.bzr' nagios-snmp-plugins-1.1.1~/check_snmp_boostedge.pl nagios-snmp-plugins-1.1.1/check_snmp_boostedge.pl
 --- nagios-snmp-plugins-1.1.1~/check_snmp_boostedge.pl	2007-01-16 23:57:14.000000000 +0100
 +++ nagios-snmp-plugins-1.1.1/check_snmp_boostedge.pl	2013-01-31 08:38:55.000000000 +0100
