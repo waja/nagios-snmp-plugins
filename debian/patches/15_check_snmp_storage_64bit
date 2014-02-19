@@ -14,13 +14,13 @@
 ##
 ## http://www.monitoring-portal.org/wbb/index.php?page=Thread&threadID=12031
 ---
- plugins/check_snmp_storage.pl | 54 ++++++++++++++++++++++++++++---------------
+ check_snmp_storage.pl | 54 ++++++++++++++++++++++++++++---------------
  1 file changed, 36 insertions(+), 18 deletions(-)
 
-diff --git a/plugins/check_snmp_storage.pl b/plugins/check_snmp_storage.pl
+diff --git a/check_snmp_storage.pl b/check_snmp_storage.pl
 index 1b8a398..a3c784f 100644
---- a/plugins/check_snmp_storage.pl
-+++ b/plugins/check_snmp_storage.pl
+--- a/check_snmp_storage.pl
++++ b/check_snmp_storage.pl
 @@ -6,7 +6,7 @@
  # Help : http://nagios.manubulon.com
  # Licence : GPL - http://www.fsf.org/licenses/gpl.txt
