@@ -1,0 +1,266 @@
+## 16_perfdata by Michael Friedrich
+##
+## DP: Add perfdata
+
+## From 264a0b15dd69a7ab4133b351b9316e1b443da154 Mon Sep 17 00:00:00 2001
+## From: Michael Friedrich <michael.friedrich@netways.de>
+## Date: Sat, 11 May 2013 11:34:47 +0200
+## Subject: [PATCH] add --perfdata next to --perfparse, clarify on what this is
+
+---
+ check_snmp_boostedge.pl     | 6 +++---
+ check_snmp_cpfw.pl          | 8 ++++----
+ check_snmp_int.pl           | 6 +++---
+ check_snmp_linkproof_nhr.pl | 6 +++---
+ check_snmp_load.pl          | 6 +++---
+ check_snmp_nsbox.pl         | 6 +++---
+ check_snmp_storage.pl       | 6 +++---
+ doc/snmp_cpfw.html          | 4 ++--
+ doc/snmp_css.html           | 4 ++--
+ doc/snmp_env.html           | 4 ++--
+ doc/snmp_int.html           | 4 ++--
+ doc/snmp_load.html          | 4 ++--
+ doc/snmp_storage.html       | 4 ++--
+ 13 files changed, 34 insertions(+), 34 deletions(-)
+
+--- a/check_snmp_boostedge.pl
++++ b/check_snmp_boostedge.pl
+@@ -121,8 +121,8 @@
+    <privproto> : Priv protocole (des|aes : default des) 
+ -P, --port=PORT
+    SNMP port (Default 161)
+--f, --perfparse
+-   Perfparse compatible output
++-f, --perfparse, --perfdata
++   Performance data output
+ -t, --timeout=INTEGER
+    timeout for SNMP in seconds (Default: 5)
+ -V, --version
+@@ -148,7 +148,7 @@
+ 	't:i'   => \$o_timeout,     'timeout:i'		=> \$o_timeout,
+ 	'V'		=> \$o_version,		'version'		=> \$o_version,
+ 	'2'     => \$o_version2,	'v2c'			=> \$o_version2,
+-	'f'     => \$o_perf,		'perfparse'		=> \$o_perf,
++	'f'     => \$o_perf,		'perfparse'		=> \$o_perf, 'perfdata'     => \$o_perf,
+ 	's:s'	=> \$o_service,		'service:s'		=> \$o_service,
+ 	'n:i'	=> \$o_nservice,	'number:i'		=> \$o_nservice
+ 	);
+--- a/check_snmp_cpfw.pl
++++ b/check_snmp_cpfw.pl
+@@ -148,8 +148,8 @@
+    check if installed policy is POLICY_NAME (must have -w)
+ -c, --connexions=WARN,CRIT
+    check warn and critical number of connexions (must have -w)
+--f, --perfparse
+-   perfparse output (only works with -c)
++-f, --perfparse, --perfdata
++   performance data output (only works with -c)
+ -P, --port=PORT
+    SNMP port (Default 161)
+ -t, --timeout=INTEGER
+@@ -183,7 +183,7 @@
+ 	'm'	=> \$o_mgmt,		'mgmt'		=> \$o_mgmt,
+ 	'p:s'	=> \$o_policy,		'policy:s'	=> \$o_policy,
+ 	'c:s'	=> \$o_conn,		'connexions:s'	=> \$o_conn,
+-	'f'	=> \$o_perf,		'perfparse'	=> \$o_perf
++	'f'	=> \$o_perf,		'perfparse'	=> \$o_perf, 'perfdata' => \$o_perf
+     );
+     if (defined ($o_help) ) { help(); exit $ERRORS{"UNKNOWN"}};
+     if (defined($o_version)) { p_version(); exit $ERRORS{"UNKNOWN"}};
+@@ -222,7 +222,7 @@
+         { print "Put a policy name !\n"; print_usage(); exit $ERRORS{"UNKNOWN"}}
+     }
+     if (defined($o_perf) && ! defined ($o_conn))
+-	{ print "Nothing selected for perfparse !\n";print_usage(); exit $ERRORS{"UNKNOWN"}}
++	{ print "Nothing selected for performance data output !\n";print_usage(); exit $ERRORS{"UNKNOWN"}}
+     if (!defined($o_fw) && !defined($o_ha) && !defined($o_mgmt) && !defined($o_svn))
+ 	{ print "Must select a product to check !\n";print_usage(); exit $ERRORS{"UNKNOWN"}}
+     if (defined ($o_ha) && ($o_ha ne "") && ($o_ha ne "standby")) 
+--- a/check_snmp_int.pl
++++ b/check_snmp_int.pl
+@@ -199,8 +199,8 @@
+   max-size of the SNMP message, usefull in case of Too Long responses.
+   Be carefull with network filters. Range 484 - 65535, default are
+   usually 1472,1452,1460 or 1440.     
+--f, --perfparse
+-   Perfparse compatible output (no output when interface is down).
++-f, --perfparse, --perfdata
++   Performance data output (no output when interface is down).
+ -e, --error
+    Add error & discard to Perfparse output
+ -S, --intspeed
+@@ -267,7 +267,7 @@
+ 	'a'	=> \$o_admin,		'admin'		=> \$o_admin,
+ 	'r'	=> \$o_noreg,		'noregexp'	=> \$o_noreg,
+ 	'V'	=> \$o_version,		'version'	=> \$o_version,
+-        'f'     => \$o_perf,            'perfparse'     => \$o_perf,
++        'f'     => \$o_perf,            'perfparse'     => \$o_perf, 'perfdata'     => \$o_perf,
+         'e'     => \$o_perfe,           'error'     	=> \$o_perfe,
+         'k'     => \$o_checkperf,       'perfcheck'   	=> \$o_checkperf,
+         'q'     => \$o_ext_checkperf,   'extperfcheck'  => \$o_ext_checkperf,
+--- a/check_snmp_linkproof_nhr.pl
++++ b/check_snmp_linkproof_nhr.pl
+@@ -100,8 +100,8 @@
+    <privproto> : Priv protocole (des|aes : default des) 
+ -P, --port=PORT
+    SNMP port (Default 161)
+--f, --perfparse
+-   Perfparse compatible output
++-f, --perfparse, --perfdata
++   Performance data output
+ -t, --timeout=INTEGER
+    timeout for SNMP in seconds (Default: 5)
+ -V, --version
+@@ -127,7 +127,7 @@
+         't:i'   => \$o_timeout,       	'timeout:i'     => \$o_timeout,
+ 	'V'	=> \$o_version,		'version'	=> \$o_version,
+ 	'2'     => \$o_version2,        'v2c'           => \$o_version2,
+-        'f'     => \$o_perf,            'perfparse'     => \$o_perf,
++        'f'     => \$o_perf,            'perfparse'     => \$o_perf, 'perfdata'     => \$o_perf
+ 	);
+     # Basic checks
+ 	if (defined($o_timeout) && (isnnum($o_timeout) || ($o_timeout < 2) || ($o_timeout > 60))) 
+--- a/check_snmp_load.pl
++++ b/check_snmp_load.pl
+@@ -178,8 +178,8 @@
+ 		hp    : HP procurve switch CPU usage
+ 		lp    : Linkproof CPU usage
+ 		hpux  : HP-UX load (1,5 & 15 minutes values)
+--f, --perfparse
+-   Perfparse compatible output
++-f, --perfparse, --perfdata
++   Performance data output
+ -t, --timeout=INTEGER
+    timeout for SNMP in seconds (Default: 5)
+ -V, --version
+@@ -207,7 +207,7 @@
+ 	'2'     => \$o_version2,        'v2c'           => \$o_version2,
+         'c:s'   => \$o_crit,            'critical:s'    => \$o_crit,
+         'w:s'   => \$o_warn,            'warn:s'        => \$o_warn,
+-        'f'     => \$o_perf,            'perfparse'     => \$o_perf,
++        'f'     => \$o_perf,            'perfparse'     => \$o_perf, 'perfdata'     => \$o_perf,
+ 	'T:s'	=> \$o_check_type,	'type:s'	=> \$o_check_type
+ 	);
+     # check the -T option
+--- a/check_snmp_nsbox.pl
++++ b/check_snmp_nsbox.pl
+@@ -126,8 +126,8 @@
+ 	number of diode and vhost that must be up.	
+ -P, --port=PORT
+    SNMP port (Default 161)
+--f, --perfparse
+-   Perfparse compatible output
++-f, --perfparse, --perfdata
++   Performance data output
+ -t, --timeout=INTEGER
+    timeout for SNMP in seconds (Default: 5)
+ -V, --version
+@@ -153,7 +153,7 @@
+ 	't:i'   => \$o_timeout,     'timeout:i'		=> \$o_timeout,
+ 	'V'		=> \$o_version,		'version'		=> \$o_version,
+ 	'2'     => \$o_version2,	'v2c'			=> \$o_version2,
+-	'f'     => \$o_perf,		'perfparse'		=> \$o_perf,
++	'f'     => \$o_perf,		'perfparse'		=> \$o_perf, 'perfdata'     => \$o_perf,
+ 	'd:s'	=> \$o_diode,		'diode:s'		=> \$o_diode,
+ 	's:s'	=> \$o_vhost,		'vhost:s'		=> \$o_vhost,
+ 	'n:s'	=> \$o_nvhost,		'number:s'		=> \$o_nvhost
+--- a/check_snmp_storage.pl
++++ b/check_snmp_storage.pl
+@@ -189,8 +189,8 @@
+    For ext2/3 filesystems, it is 5% by default
+ -G, --gigabyte
+    output, warning & critical levels in gigabytes
+--f, --perfparse
+-   Perfparse compatible output
++-f, --perfparse, --perfdata
++   Performance data output
+ -S, --short=<type>[,<where>,<cut>]
+    <type>: Make the output shorter :
+      0 : only print the global result except the disk in warning or critical
+@@ -255,7 +255,7 @@
+ 		'q:s'  	=> \$o_storagetype,	'storagetype:s'=> \$o_storagetype,
+ 	'S:s'   => \$o_short,         	'short:s'       => \$o_short,
+ 	'o:i'   => \$o_octetlength,    	'octetlength:i' => \$o_octetlength,
+-	'f'	=> \$o_perf,		'perfparse'	=> \$o_perf,
++	'f'	=> \$o_perf,		'perfparse'	=> \$o_perf, 'perfdata' => \$o_perf,
+ 	'R:i'	=> \$o_reserve,	        'reserved:i'	=> \$o_reserve,
+ 	'G'	=> \$o_giga,	        'gigabyte'	=> \$o_giga
+     );
+--- a/doc/snmp_cpfw.html
++++ b/doc/snmp_cpfw.html
+@@ -414,8 +414,8 @@
+                     check if installed policy is POLICY_NAME (must have -w)<br>
+                     -c, --connexions=WARN,CRIT<br>
+                     check warn and critical number of connexions (must have -w)<br>
+-                    -f, --perfparse<br>
+-                    perfparse output (only works with -c)<br>
++                    -f, --perfparse, --perfdata<br>
++                    performance data output (only works with -c)<br>
+                     -P, --port=PORT<br>
+                     SNMP port (Default 161)<br>
+                     -t, --timeout=INTEGER<br>
+--- a/doc/snmp_css.html
++++ b/doc/snmp_css.html
+@@ -289,8 +289,8 @@
+    &lt;privproto&gt; : Priv protocole (des|aes : default des) 
+ -P, --port=PORT
+    SNMP port (Default 161)
+--f, --perfparse
+-   Perfparse compatible output
++-f, --perfparse, --perfdata
++   Performance data output
+ -t, --timeout=INTEGER
+    timeout for SNMP in seconds (Default: 5)
+ -V, --version
+--- a/doc/snmp_env.html
++++ b/doc/snmp_env.html
+@@ -319,8 +319,8 @@
+                     Minimum fan rpm value<br>
+                     -c, --celcius=&lt;celcius&gt;<br>
+                     Maximum temp in degree celcius<br>
+-                    -f, --perfparse<br>
+-                    Perfparse compatible output<br>
++                    -f, --perfparse, --perfdata<br>
++                    Performance data output<br>
+                     -t, --timeout=INTEGER<br>
+                     timeout for SNMP in seconds (Default: 5)<br>
+                     -V, --version<br>
+--- a/doc/snmp_int.html
++++ b/doc/snmp_int.html
+@@ -594,8 +594,8 @@
+                     Be carefull with network filters. Range 484 - 65535, default 
+                     are<br>
+                     usually 1472,1452,1460 or 1440. <br>
+-                    -f, --perfparse<br>
+-                    Perfparse compatible output (no output when interface is down).<br>
++                    -f, --perfparse, --perfdata<br>
++                    Performance data output (no output when interface is down).<br>
+                     -e, --error<br>
+                     Add error &amp; discard to Perfparse output<br>
+                     -S, --intspeed<br>
+--- a/doc/snmp_load.html
++++ b/doc/snmp_load.html
+@@ -357,8 +357,8 @@
+                     nokia : Nokia CPU usage<br>
+                     hp : HP procurve switch CPU usage<br>
+                     lp : Linkproof CPU usage<br>
+-                    -f, --perfparse<br>
+-                    Perfparse compatible output<br>
++                    -f, --perfparse, --perfdata<br>
++                    Performance data output<br>
+                     -t, --timeout=INTEGER<br>
+                     timeout for SNMP in seconds (Default: 5)<br>
+                     -V, --version<br>
+--- a/doc/snmp_storage.html
++++ b/doc/snmp_storage.html
+@@ -1211,8 +1211,8 @@
+                     -c, --critical=INTEGER<br>
+                     percent / MB of disk used to generate CRITICAL state<br>
+                     you can add the % sign <br>
+-                    -f, --perfparse<br>
+-                    Perfparse compatible output<br>
++                    -f, --perfparse, --perfdata<br>
++                    Performance data output<br>
+                     -S, --short=&lt;type&gt;[,&lt;where&gt;,&lt;cut&gt;]<br>
+                     &lt;type&gt;: Make the output shorter :<br>
+                     0 : only print the global result except the disk in warning 
