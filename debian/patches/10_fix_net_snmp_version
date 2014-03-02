@@ -1,6 +1,8 @@
 ## 10_fix_net_snmp_version by Jan Wagner <waja@cyconet.org>
 ##
 ## DP: Fixing Net::SNMP version
+## DP: sed -i 's/Net::SNMP->VERSION < 4/Net::SNMP->VERSION lt 4/g'
+## DP: fix Argument "v6.0.1" isn't numeric in numeric lt (<)
 ## DP: (see https://wiki.icinga.org/display/howtos/check_snmp#checksnmp-Argumentv601isntnumericinnumericlt)
 
 --- a/check_snmp_boostedge.pl
