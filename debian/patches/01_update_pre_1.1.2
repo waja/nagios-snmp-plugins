@@ -1,0 +1,1041 @@
+## 01_check_snmp_env by Jan Wagner <waja@cyconet.org>
+##
+## DP: Fix some issues via cvs version
+
+--- old/check_snmp_env.pl	2007-07-04 09:46:55.000000000 +0200
++++ new/check_snmp_env.pl	2007-07-06 22:17:06.000000000 +0200
+@@ -1,7 +1,7 @@
+ #!/usr/bin/perl -w 
+ ############################## check_snmp_env #################
+-# Version : 1.2
+-# Date : April 19 2007
++# Version : 1.3
++# Date : May 24 2007
+ # Author  : Patrick Proy ( patrick at proy.org)
+ # Help : http://www.manubulon.com/nagios/
+ # Licence : GPL - http://www.fsf.org/licenses/gpl.txt
+@@ -145,9 +145,24 @@
+ 
+ my @foundry_status = (3,0,2); # oper status : 1:other, 2: Normal, 3: Failure 
+ 
++# Linux Net-SNMP with LM-SENSORS
++my $linux_temp		= "1.3.6.1.4.1.2021.13.16.2.1"; # temperature table
++my $linux_temp_descr	= "1.3.6.1.4.1.2021.13.16.2.1.2"; # temperature entry description
++my $linux_temp_value	= "1.3.6.1.4.1.2021.13.16.2.1.3"; # temperature entry value (mC)
++my $linux_fan		= "1.3.6.1.4.1.2021.13.16.3.1"; # fan table
++my $linux_fan_descr	= "1.3.6.1.4.1.2021.13.16.3.1.2"; # fan entry description
++my $linux_fan_value	= "1.3.6.1.4.1.2021.13.16.3.1.3"; # fan entry value (RPM)
++my $linux_volt		= "1.3.6.1.4.1.2021.13.16.4.1"; # voltage table
++my $linux_volt_descr	= "1.3.6.1.4.1.2021.13.16.4.1.2"; # voltage entry description
++my $linux_volt_value	= "1.3.6.1.4.1.2021.13.16.4.1.3"; # voltage entry value (mV)
++my $linux_misc		= "1.3.6.1.4.1.2021.13.16.4.1"; # misc table
++my $linux_misc_descr	= "1.3.6.1.4.1.2021.13.16.4.1.2"; # misc entry description
++my $linux_misc_value	= "1.3.6.1.4.1.2021.13.16.4.1.3"; # misc entry value
++
++
+ # Globals
+ 
+-my $Version='1.2';
++my $Version='1.3';
+ 
+ my $o_host = 	undef; 		# hostname
+ my $o_community = undef; 	# community
+@@ -160,7 +175,7 @@
+ my $o_version2= undef;          # use snmp v2c
+ # check type  
+ my $o_check_type= "cisco";	 # default Cisco
+-my @valid_types	=("cisco","nokia","bc","iron","foundry");	
++my @valid_types	=("cisco","nokia","bc","iron","foundry","linux");	
+ my $o_temp=	undef;		# max temp
+ my $o_fan=	undef;		# min fan speed
+ 
+@@ -177,7 +192,7 @@
+ sub p_version { print "check_snmp_env version : $Version\n"; }
+ 
+ sub print_usage {
+-    print "Usage: $0 [-v] -H <host> -C <snmp_community> [-2] | (-l login -x passwd [-X pass -L <authp>,<privp>])  [-p <port>] -T (cisco|nokia|bc|iron|foundry) [-F <rpm>] [-c <celcius>] [-f] [-t <timeout>] [-V]\n";
++    print "Usage: $0 [-v] -H <host> -C <snmp_community> [-2] | (-l login -x passwd [-X pass -L <authp>,<privp>])  [-p <port>] -T (cisco|nokia|bc|iron|foundry|linux) [-F <rpm>] [-c <celcius>] [-f] [-t <timeout>] [-V]\n";
+ }
+ 
+ sub isnnum { # Return true if arg is not a number
+@@ -221,17 +236,18 @@
+ -P, --port=PORT
+    SNMP port (Default 161)
+ -T, --type=cisco|nokia|bc|iron|foundry
+-	Environemental check : 
+-		cisco : voltage,temp,fan,power supply status
+-		        will try to check everything present
+-		nokia : fan and power supply
+-		bc : fans, power supply, voltage, disks
+-		iron : fans, power supply, temp
+-		foundry : power supply, temp
++   Environemental check : 
++	cisco : All Cisco equipements : voltage,temp,fan,power supply
++	        (will try to check everything in the env mib)
++	nokia : Nokia IP platforms : fan and power supply
++	bc : BlueCoat platforms : fans, power supply, voltage, disks
++	iron : IronPort platforms : fans, power supply, temp
++	foundry : Foundry Network platforms : power supply, temp
++	linux : Net-SNMP with LM-SENSORS : temp, fan, volt, misc
+ -F, --fan=<rpm>
+-   Minimum fan rpm value
++   Minimum fan rpm value (only needed for 'iron' & 'linux')
+ -c, --celcius=<celcius>
+-   Maximum temp in degree celcius
++   Maximum temp in degree celcius (only needed for 'iron' & 'linux')
+ -f, --perfparse
+    Perfparse compatible output
+ -t, --timeout=INTEGER
+@@ -428,8 +444,10 @@
+     if (!defined ($cur_status)) { ### Error TODO
+       $volt_global=1;
+     } 
+-    $perf_output.=" '".$$resultat{$ciscoVoltageTableDesc .".".$voltindex[$i]}."'=" ;
+-    $perf_output.=$$resultat{$ciscoVoltageTableValue."." . $voltindex[$i]};
++    if (defined($$resultat{$ciscoVoltageTableValue."." . $voltindex[$i]})) {
++      $perf_output.=" '".$$resultat{$ciscoVoltageTableDesc .".".$voltindex[$i]}."'=" ;
++      $perf_output.=$$resultat{$ciscoVoltageTableValue."." . $voltindex[$i]};
++    }	
+     if ($Nagios_state[$CiscoEnvMonNagios{$cur_status}] ne "OK") {
+       $volt_global= 1;
+       $volt_status{$$resultat{$ciscoVoltageTableDesc .".".$voltindex[$i]}}=$cur_status;
+@@ -448,8 +466,10 @@
+     if (!defined ($cur_status)) { ### Error TODO
+       $temp_global=1;
+     }
+-    $perf_output.=" '".$$resultat{$ciscoTempTableDesc .".".$tempindex[$i]}."'=" ;
+-    $perf_output.=$$resultat{$ciscoTempTableValue."." . $tempindex[$i]};
++    if (defined($$resultat{$ciscoTempTableValue."." . $tempindex[$i]})) {
++      $perf_output.=" '".$$resultat{$ciscoTempTableDesc .".".$tempindex[$i]}."'=" ;
++      $perf_output.=$$resultat{$ciscoTempTableValue."." . $tempindex[$i]};
++    }
+     if ($Nagios_state[$CiscoEnvMonNagios{$cur_status}] ne "OK") {
+       $temp_global= 1;
+       $temp_status{$$resultat{$ciscoTempTableDesc .".".$tempindex[$i]}}=$cur_status;
+@@ -1003,4 +1023,14 @@
+ 
+ }
+ 
+-exit (3);
++########### Cisco env checks ##############
++if ($o_check_type eq "linux") {
++
++ verb("Checking linux env");
++
++ print "Not implemented yet : UNKNOWN\n";
++ exit $ERRORS{"UNKNOWN"};
++}
++
++print "Unknown check type : UNKNOWN\n";
++exit $ERRORS{"UNKNOWN"};
+## 02_check_snmp_int by Jan Wagner <waja@cyconet.org>
+##
+## DP: Update script to version 1.24
+
+
+diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_int.pl nagios-snmp-plugins-1.1.1/check_snmp_int.pl
+--- nagios-snmp-plugins-1.1.1.orig/check_snmp_int.pl	2007-04-23 11:40:39.000000000 +0200
++++ nagios-snmp-plugins-1.1.1/check_snmp_int.pl	2007-10-12 22:23:22.000000000 +0200
+@@ -1,13 +1,12 @@
+ #!/usr/bin/perl -w
+ ############################## check_snmp_int ##############
+-# Version : 1.4.6
+-# Date : April 23 2007
++my $Version='1.24';
++# Date : Oct 10 2007
+ # Author  : Patrick Proy ( patrick at proy.org )
+ # Help : http://nagios.manubulon.com
+ # Licence : GPL - http://www.fsf.org/licenses/gpl.txt
+ # Contrib : J. Jungmann, S. Probst, R. Leroy, M. Berger
+ # TODO : 
+-# Check isdn "dormant" state
+ # Maybe put base directory for performance as an option
+ #################################################################
+ #
+@@ -23,10 +22,8 @@
+ 
+ # Nagios specific
+ 
+-use lib "/usr/local/nagios/libexec";
+-use utils qw(%ERRORS $TIMEOUT);
+-#my $TIMEOUT = 5;
+-#my %ERRORS=('OK'=>0,'WARNING'=>1,'CRITICAL'=>2,'UNKNOWN'=>3,'DEPENDENT'=>4);
++my $TIMEOUT = 15;
++my %ERRORS=('OK'=>0,'WARNING'=>1,'CRITICAL'=>2,'UNKNOWN'=>3,'DEPENDENT'=>4);
+ 
+ # SNMP Datas
+ 
+@@ -36,6 +33,7 @@
+ my $oper_table = '1.3.6.1.2.1.2.2.1.8.';
+ my $admin_table = '1.3.6.1.2.1.2.2.1.7.';
+ my $speed_table = '1.3.6.1.2.1.2.2.1.5.';
++my $speed_table_64 = '1.3.6.1.2.1.31.1.1.1.15.';
+ my $in_octet_table = '1.3.6.1.2.1.2.2.1.10.';
+ my $in_octet_table_64 = '1.3.6.1.2.1.31.1.1.1.6.';
+ my $in_error_table = '1.3.6.1.2.1.2.2.1.14.';
+@@ -49,7 +47,6 @@
+ 
+ # Globals
+ 
+-my $Version='1.4.6';
+ 
+ # Standard options
+ my $o_host = 		undef; 	# hostname
+@@ -58,6 +55,7 @@
+ my $o_help=		undef; 	# wan't some help ?
+ my $o_admin=		undef;	# admin status instead of oper
+ my $o_inverse=  	undef;	# Critical when up
++my $o_dormant=        	undef;  # Dormant state is OK
+ my $o_verb=		undef;	# verbose mode
+ my $o_version=		undef;	# print version
+ my $o_noreg=		undef;	# Do not use Regexp for name
+@@ -66,16 +64,16 @@
+ # Performance data options 
+ my $o_perf=     	undef;  # Output performance data
+ my $o_perfe=		undef;	# Output discard/error also in perf data
+-my $o_perfs=	undef; # include speed in performance output (-S)
+-my $o_perfp=	undef; # output performance data in % of max speed (-y)
+-my $o_perfr=	undef; # output performance data in bits/s or Bytes/s (-Y)
++my $o_perfs=		undef; # include speed in performance output (-S)
++my $o_perfp=		undef; # output performance data in % of max speed (-y)
++my $o_perfr=		undef; # output performance data in bits/s or Bytes/s (-Y)
+ # Speed/error checks
+ my $o_checkperf=	undef;	# checks in/out/err/disc values
+ my $o_delta=		300;	# delta of time of perfcheck (default 5min)
+ my $o_ext_checkperf=	undef;  # extended perf checks (+error+discard) 
+ my $o_warn_opt=		undef;  # warning options
+ my $o_crit_opt=		undef;  # critical options
+-my $o_kbits=	undef;	# Warn and critical in Kbits instead of KBytes
++my $o_kbits=		undef;	# Warn and critical in Kbits instead of KBytes
+ my @o_warn=		undef;  # warning levels of perfcheck
+ my @o_crit=		undef;  # critical levels of perfcheck
+ my $o_highperf=		undef;	# Use 64 bits counters
+@@ -152,7 +150,7 @@
+ sub p_version { print "check_snmp_int version : $Version\n"; }
+ 
+ sub print_usage {
+-    print "Usage: $0 [-v] -H <host> -C <snmp_community> [-2] | (-l login -x passwd [-X pass -L <authp>,<privp>)  [-p <port>] -n <name in desc_oid> [-i] [-a] [-r] [-f[eSyY]] [-k[qBMGu] -g -w<warn levels> -c<crit levels> -d<delta>] [-o <octet_length>] [-t <timeout>] [-s] --label [-V]\n";
++    print "Usage: $0 [-v] -H <host> -C <snmp_community> [-2] | (-l login -x passwd [-X pass -L <authp>,<privp>)  [-p <port>] -n <name in desc_oid> [-i -a -D] [-r] [-f[eSyY]] [-k[qBMGu] -g -w<warn levels> -c<crit levels> -d<delta>] [-o <octet_length>] [-t <timeout>] [-s] --label [-V]\n";
+ }
+ 
+ sub isnnum { # Return true if arg is not a number
+@@ -195,6 +193,8 @@
+    Make critical when up
+ -a, --admin
+    Use administrative status instead of operational
++-D, --dormant
++   Dormant state is an OK state
+ -o, --octetlength=INTEGER
+   max-size of the SNMP message, usefull in case of Too Long responses.
+   Be carefull with network filters. Range 484 - 65535, default are
+@@ -214,8 +214,8 @@
+ --label
+    Add label before speed in output : in=, out=, errors-out=, etc...
+ -g, --64bits
+-   Use 64 bits counters instead of the standard counters  
+-   when checking bandwidth & performance data.
++   Use 64 bits counters instead of the standard counters when checking 
++   bandwidth & performance data for interface >= 1Gbps.
+    You must use snmp v2c or v3 to get 64 bits counters.
+ -d, --delta=seconds
+    make an average of <delta> seconds (default 300=5min)
+@@ -284,7 +284,8 @@
+         'u'   	=> \$o_prct,      	'prct'   	=> \$o_prct,
+ 		'o:i'   => \$o_octetlength,    	'octetlength:i' => \$o_octetlength,
+ 		'label'   => \$o_label,    	
+-        'd:i'   => \$o_delta,           'delta:i'     	=> \$o_delta
++        'd:i'   => \$o_delta,           'delta:i'     	=> \$o_delta,
++	'D'   => \$o_dormant,           'dormant'             => \$o_dormant
+     );
+     if (defined ($o_help) ) { help(); exit $ERRORS{"UNKNOWN"}};
+     if (defined($o_version)) { p_version(); exit $ERRORS{"UNKNOWN"}};
+@@ -460,6 +461,7 @@
+ my (@oid_perf,@oid_perf_outoct,@oid_perf_inoct,@oid_perf_inerr,@oid_perf_outerr,@oid_perf_indisc,@oid_perf_outdisc)=
+    (undef,undef,undef,undef,undef,undef,undef);
+ my @oid_speed=undef;
++my @oid_speed_high=undef;
+ my $num_int = 0;
+ 
+ # Change to 64 bit counters if option is set : 
+@@ -494,7 +496,8 @@
+      if (defined($o_perf) || defined($o_checkperf)) {
+        $oid_perf_inoct[$num_int]= $in_octet_table . $tindex[$num_int];
+        $oid_perf_outoct[$num_int]= $out_octet_table . $tindex[$num_int];
+-	   $oid_speed[$num_int]=$speed_table . $tindex[$num_int];
++       $oid_speed[$num_int]=$speed_table . $tindex[$num_int];
++       $oid_speed_high[$num_int]=$speed_table_64 . $tindex[$num_int];
+        if (defined($o_ext_checkperf) || defined($o_perfe)) {
+ 	 $oid_perf_indisc[$num_int]= $in_discard_table . $tindex[$num_int];
+ 	 $oid_perf_outdisc[$num_int]= $out_discard_table . $tindex[$num_int];
+@@ -509,25 +512,25 @@
+ # No interface found -> error
+ if ( $num_int == 0 ) { print "ERROR : Unknown interface $o_descr\n" ; exit $ERRORS{"UNKNOWN"};}
+ 
+-my ($result,$resultf)=(undef,undef);
++my $result=undef;
++# Add performance oids if requested 
++if (defined($o_perf)||defined($o_checkperf)) {
++  @oids=(@oids,@oid_perf_outoct,@oid_perf_inoct,@oid_speed);
++  if (defined($o_highperf)) { 
++    @oids=(@oids,@oid_speed_high);
++  }   
++  if (defined ($o_ext_checkperf) || defined($o_perfe)) {
++    @oids=(@oids,@oid_perf_inerr,@oid_perf_outerr,@oid_perf_indisc,@oid_perf_outdisc);
++  }
++}
++
+ # Get the requested oid values
+ $result = $session->get_request(
+    Varbindlist => \@oids
+ );
+-if (!defined($result)) { printf("ERROR: Status table : %s.\n", $session->error); $session->close;
++if (!defined($result)) { printf("ERROR: Status/statistics table : %s.\n", $session->error); $session->close;
+    exit $ERRORS{"UNKNOWN"};
+ }
+-# Get the perf value if -f (performance) option defined or -k (check bandwidth)
+-if (defined($o_perf)||defined($o_checkperf)) {
+-  @oid_perf=(@oid_perf_outoct,@oid_perf_inoct,@oid_perf_inerr,@oid_perf_outerr,@oid_perf_indisc,@oid_perf_outdisc,@oid_speed);
+-  $resultf = $session->get_request(
+-   Varbindlist => \@oid_perf
+-  );
+-  if (!defined($resultf)) { printf("ERROR: Statistics table : %s.\n", $session->error); $session->close;
+-     exit $ERRORS{"UNKNOWN"};
+-  }
+-}
+-
+ 
+ $session->close;
+ 
+@@ -544,6 +547,7 @@
+ my $trigger_low=$timenow - 3*$o_delta;
+ my ($old_value,$old_time)=undef;
+ my $speed_unit=undef;
++my $speed_real=undef; # speed of interface using either standard or highperf mib.
+ 
+ # define the OK value depending on -i option
+ my $ok_val= defined ($o_inverse) ? 2 : 1;
+@@ -570,7 +574,22 @@
+     $n_rows = shift(@ret_array);
+     if ($n_rows != 0) { @file_values = @ret_array };     
+     verb ("File read returns : $return with $n_rows rows");
+-	verb ("Interface speed : $$resultf{$oid_speed[$i]}");
++    # Get the speed in normal or highperf speed counters
++    if ($$result{$oid_speed[$i]} == 4294967295) { # Too high for this counter (cf IF-MIB)
++       if (! defined($o_highperf) && (defined($o_prct) || defined ($o_perfs) || defined ($o_perfp))) {
++          print "Cannot get interface speed with standard MIB, use highperf mib (-g) : UNKNOWN\n";
++	  exit $ERRORS{"UNKNOWN"}
++ 	}
++       if (defined ($$result{$oid_speed_high[$i]}) && $$result{$oid_speed_high[$i]} != 0) {
++	  $speed_real=$$result{$oid_speed_high[$i]} * 1000000;
++       } else {
++          print "Cannot get interface speed using highperf mib : UNKNOWN\n";
++          exit $ERRORS{"UNKNOWN"}
++	}
++    } else {
++      $speed_real=$$result{$oid_speed[$i]};
++    }
++    verb ("Interface speed : $speed_real");
+     #make the checks if the file is OK  
+     if ($return ==0) {
+       my $j=$n_rows-1;
+@@ -583,7 +602,7 @@
+ 		my $speed_metric=undef;
+ 		if (defined($o_prct)) { # in % of speed
+ 		  # Speed is in bits/s, calculated speed is in Bytes/s
+-		  $speed_metric=$$resultf{$oid_speed[$i]}/800;
++		  $speed_metric=$speed_real/800;
+ 		  $speed_unit="%";
+ 		} else {
+ 		  if (defined($o_kbits)) { # metric in bits
+@@ -614,24 +633,24 @@
+ 		# First set the modulus depending on highperf counters or not
+ 		my $overfl_mod = defined ($o_highperf) ? 18446744073709551616 : 4294967296;
+ 	    # Check counter (s)
+-		my $overfl = ($$resultf{$oid_perf_inoct[$i]} >= $file_values[$j][1] ) ? 0 : $overfl_mod;
+-	    $checkperf_out_raw[0] = ( ($overfl + $$resultf{$oid_perf_inoct[$i]} - $file_values[$j][1])/
++		my $overfl = ($$result{$oid_perf_inoct[$i]} >= $file_values[$j][1] ) ? 0 : $overfl_mod;
++	    $checkperf_out_raw[0] = ( ($overfl + $$result{$oid_perf_inoct[$i]} - $file_values[$j][1])/
+ 	      			      ($timenow - $file_values[$j][0] ));
+ 		$checkperf_out[0] = $checkperf_out_raw[0] / $speed_metric;
+ 	    
+-	    $overfl = ($$resultf{$oid_perf_outoct[$i]} >= $file_values[$j][2] ) ? 0 : $overfl_mod;
+-		$checkperf_out_raw[1] = ( ($overfl + $$resultf{$oid_perf_outoct[$i]} - $file_values[$j][2])/
++	    $overfl = ($$result{$oid_perf_outoct[$i]} >= $file_values[$j][2] ) ? 0 : $overfl_mod;
++		$checkperf_out_raw[1] = ( ($overfl + $$result{$oid_perf_outoct[$i]} - $file_values[$j][2])/
+ 				      ($timenow - $file_values[$j][0] ));
+ 	    $checkperf_out[1] = $checkperf_out_raw[1] / $speed_metric;
+ 	    
+ 	    if (defined($o_ext_checkperf)) {
+-	      $checkperf_out[2] = ( ($$resultf{$oid_perf_inerr[$i]} - $file_values[$j][3])/
++	      $checkperf_out[2] = ( ($$result{$oid_perf_inerr[$i]} - $file_values[$j][3])/
+ 				($timenow - $file_values[$j][0] ))*60;
+-	      $checkperf_out[3] = ( ($$resultf{$oid_perf_outerr[$i]} - $file_values[$j][4])/
++	      $checkperf_out[3] = ( ($$result{$oid_perf_outerr[$i]} - $file_values[$j][4])/
+ 				($timenow - $file_values[$j][0] ))*60;
+-	      $checkperf_out[4] = ( ($$resultf{$oid_perf_indisc[$i]} - $file_values[$j][5])/
++	      $checkperf_out[4] = ( ($$result{$oid_perf_indisc[$i]} - $file_values[$j][5])/
+ 				($timenow - $file_values[$j][0] ))*60;
+-	      $checkperf_out[5] = ( ($$resultf{$oid_perf_outdisc[$i]} - $file_values[$j][6])/
++	      $checkperf_out[5] = ( ($$result{$oid_perf_outdisc[$i]} - $file_values[$j][6])/
+ 				($timenow - $file_values[$j][0] ))*60;
+ 	    }
+ 	  }
+@@ -641,13 +660,13 @@
+     } 
+     # Put the new values in the array and write the file
+     $file_values[$n_rows][0]=$timenow;
+-    $file_values[$n_rows][1]=$$resultf{$oid_perf_inoct[$i]};
+-    $file_values[$n_rows][2]=$$resultf{$oid_perf_outoct[$i]};
++    $file_values[$n_rows][1]=$$result{$oid_perf_inoct[$i]};
++    $file_values[$n_rows][2]=$$result{$oid_perf_outoct[$i]};
+     if (defined($o_ext_checkperf)) { # Add other values (error & disc)
+-      $file_values[$n_rows][3]=$$resultf{$oid_perf_inerr[$i]};
+-      $file_values[$n_rows][4]=$$resultf{$oid_perf_outerr[$i]};
+-      $file_values[$n_rows][5]=$$resultf{$oid_perf_indisc[$i]};
+-      $file_values[$n_rows][6]=$$resultf{$oid_perf_outdisc[$i]};
++      $file_values[$n_rows][3]=$$result{$oid_perf_inerr[$i]};
++      $file_values[$n_rows][4]=$$result{$oid_perf_outerr[$i]};
++      $file_values[$n_rows][5]=$$result{$oid_perf_indisc[$i]};
++      $file_values[$n_rows][6]=$$result{$oid_perf_outdisc[$i]};
+     } 
+     $n_rows++;
+     $return=write_file($temp_file_name,$n_rows,$n_items_check,@file_values);
+@@ -703,62 +722,79 @@
+   }
+   # Get rid of special caracters for performance in description
+   $descr[$i] =~ s/'\/\(\)/_/g;
+-  if ( $int_status == $ok_val) {
++  if (( $int_status == $ok_val)||(defined($o_dormant) && $int_status == 5)) {
+     $num_ok++;
+   }
+   if (( $int_status == 1 ) && defined ($o_perf)) {
+     if (defined ($o_perfp)) { # output in % of speed
+ 	  if ($usable_data==1) {
++	     my $warn_factor=1;
++	     if (!defined($o_prct)) { # warn&crit in K|M|G B|bps -> put warn_factor to make %
++		$warn_factor = (defined($o_meg)) ? 1000000 : (defined($o_gig)) ? 1000000000 : 1000;
++		if (!defined($o_kbits)) { $warn_factor*=8;}
++		$warn_factor/=$speed_real; 
++		$warn_factor*=100; # now turn into displayed % : 0,1 = 10%
++	     } 
+ 	    $perf_out .= "'" . $descr[$i] ."_in_prct'=";
+-		$perf_out .= sprintf("%.0f",$checkperf_out_raw[0] * 800 / $$resultf{$oid_speed[$i]}) ."%;";
+-		$perf_out .= ($o_warn[0]!=0) ? $o_warn[0] . ";" : ";";
+-		$perf_out .= ($o_crit[0]!=0) ? $o_crit[0] . ";" : ";"; 
++		$perf_out .= sprintf("%.0f",$checkperf_out_raw[0] * 800 / $speed_real) ."%;";
++		$perf_out .= ($o_warn[0]!=0) ? sprintf("%.0f",$o_warn[0]*$warn_factor) . ";" : ";";
++		$perf_out .= ($o_crit[0]!=0) ? sprintf("%.0f",$o_crit[0]*$warn_factor) . ";" : ";"; 
+ 		$perf_out .= "0;100 ";
+ 	    $perf_out .= "'" . $descr[$i] ."_out_prct'=";
+-		$perf_out .= sprintf("%.0f",$checkperf_out_raw[1] * 800 / $$resultf{$oid_speed[$i]}) ."%;";
+-		$perf_out .= ($o_warn[1]!=0) ? $o_warn[1] . ";" : ";";
+-		$perf_out .= ($o_crit[1]!=0) ? $o_crit[1] . ";" : ";"; 
++		$perf_out .= sprintf("%.0f",$checkperf_out_raw[1] * 800 / $speed_real) ."%;";
++		$perf_out .= ($o_warn[1]!=0) ? sprintf("%.0f",$o_warn[1]*$warn_factor) . ";" : ";";
++		$perf_out .= ($o_crit[1]!=0) ? sprintf("%.0f",$o_crit[1]*$warn_factor) . ";" : ";"; 
+ 		$perf_out .= "0;100 ";
+ 	  }
+ 	} elsif (defined ($o_perfr)) { # output in bites or Bytes /s
+ 	  if ($usable_data==1) {
+   	    if (defined($o_kbits)) { # bps
+ 		  # put warning and critical levels into bps or Bps
+-		  my $warn_factor = (defined($o_meg)) ? 1000000 : (defined($o_gig)) ? 1000000000 : 1000;
++		  my $warn_factor;
++		  if (defined($o_prct)) { # warn&crit in % -> put warn_factor to 1% of speed in bps
++			$warn_factor=$speed_real/100;
++		  } else { # just convert from K|M|G bps
++			$warn_factor = (defined($o_meg)) ? 1000000 : (defined($o_gig)) ? 1000000000 : 1000;
++		  }
+ 	      $perf_out .= "'" . $descr[$i] ."_in_bps'=";
+           $perf_out .= sprintf("%.0f",$checkperf_out_raw[0] * 8) .";";
+ 		  $perf_out .= ($o_warn[0]!=0) ? $o_warn[0]*$warn_factor . ";" : ";";
+ 		  $perf_out .= ($o_crit[0]!=0) ? $o_crit[0]*$warn_factor . ";" : ";";
+-		  $perf_out .= "0;". $$resultf{$oid_speed[$i]} ." ";		  
++		  $perf_out .= "0;". $speed_real ." ";		  
+ 	      $perf_out .= "'" . $descr[$i] ."_out_bps'=";
+           $perf_out .= sprintf("%.0f",$checkperf_out_raw[1] * 8) .";";
+ 		  $perf_out .= ($o_warn[1]!=0) ? $o_warn[1]*$warn_factor . ";" : ";";
+ 		  $perf_out .= ($o_crit[1]!=0) ? $o_crit[1]*$warn_factor . ";" : ";";
+-		  $perf_out .= "0;". $$resultf{$oid_speed[$i]} ." ";		  		  
++		  $perf_out .= "0;". $speed_real ." ";		  		  
+ 	    } else { # Bps
+-		  my $warn_factor = (defined($o_meg)) ? 1048576 : (defined($o_gig)) ? 1073741824 : 1024;
++                  my $warn_factor; 
++                  if (defined($o_prct)) { # warn&crit in % -> put warn_factor to 1% of speed in Bps
++                        $warn_factor=$speed_real/800;
++                  } else { # just convert from K|M|G bps
++			$warn_factor = (defined($o_meg)) ? 1048576 : (defined($o_gig)) ? 1073741824 : 1024;
++		  }
+ 	      $perf_out .= "'" . $descr[$i] ."_in_Bps'=" . sprintf("%.0f",$checkperf_out_raw[0]) .";";
+ 		  $perf_out .= ($o_warn[0]!=0) ? $o_warn[0]*$warn_factor . ";" : ";";
+ 		  $perf_out .= ($o_crit[0]!=0) ? $o_crit[0]*$warn_factor . ";" : ";";
+-		  $perf_out .= "0;". $$resultf{$oid_speed[$i]} ." ";		 		  
++		  $perf_out .= "0;". $speed_real / 8 ." ";		 		  
+ 	      $perf_out .= "'" . $descr[$i] ."_out_Bps'=" . sprintf("%.0f",$checkperf_out_raw[1]) .";" ;
+ 		  $perf_out .= ($o_warn[1]!=0) ? $o_warn[1]*$warn_factor . ";" : ";";
+ 		  $perf_out .= ($o_crit[1]!=0) ? $o_crit[1]*$warn_factor . ";" : ";";
+-		  $perf_out .= "0;". $$resultf{$oid_speed[$i]} ." ";		  
++		  $perf_out .= "0;". $speed_real / 8 ." ";		  
+ 	    }
+ 	  }
+ 	} else { # output in octet counter
+-      $perf_out .= "'" . $descr[$i] ."_in_octet'=". $$resultf{$oid_perf_inoct[$i]} ."c ";  
+-      $perf_out .= "'" . $descr[$i] ."_out_octet'=". $$resultf{$oid_perf_outoct[$i]} ."c";  
++      $perf_out .= "'" . $descr[$i] ."_in_octet'=". $$result{$oid_perf_inoct[$i]} ."c ";  
++      $perf_out .= "'" . $descr[$i] ."_out_octet'=". $$result{$oid_perf_outoct[$i]} ."c ";  
+ 	}
+     if (defined ($o_perfe)) {
+-      $perf_out .= " '" . $descr[$i] ."_in_error'=". $$resultf{$oid_perf_inerr[$i]} ."c ";
+-      $perf_out .= "'" . $descr[$i] ."_in_discard'=". $$resultf{$oid_perf_indisc[$i]} ."c ";
+-      $perf_out .= "'" . $descr[$i] ."_out_error'=". $$resultf{$oid_perf_outerr[$i]} ."c ";
+-      $perf_out .= "'" . $descr[$i] ."_out_discard'=". $$resultf{$oid_perf_outdisc[$i]} ."c";
++      $perf_out .= "'" . $descr[$i] ."_in_error'=". $$result{$oid_perf_inerr[$i]} ."c ";
++      $perf_out .= "'" . $descr[$i] ."_in_discard'=". $$result{$oid_perf_indisc[$i]} ."c ";
++      $perf_out .= "'" . $descr[$i] ."_out_error'=". $$result{$oid_perf_outerr[$i]} ."c ";
++      $perf_out .= "'" . $descr[$i] ."_out_discard'=". $$result{$oid_perf_outdisc[$i]} ."c ";
+     }
+ 	if (defined ($o_perfs)) {
+-	  $perf_out .= " '" . $descr[$i] ."_speed_bps'=".$$resultf{$oid_speed[$i]}; 
++	  $perf_out .= "'" . $descr[$i] ."_speed_bps'=".$speed_real; 
+ 	}
+   } 
+ }
+## 03_check_snmp_load by Jan Wagner <waja@cyconet.org>
+##
+## DP: Update script to version 1.12
+
+diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_load.pl nagios-snmp-plugins-1.1.1/check_snmp_load.pl
+--- nagios-snmp-plugins-1.1.1.orig/check_snmp_load.pl	2007-04-16 19:41:20.000000000 +0200
++++ nagios-snmp-plugins-1.1.1/check_snmp_load.pl	2007-10-12 22:23:23.000000000 +0200
+@@ -1,11 +1,10 @@
+ #!/usr/bin/perl -w 
+ ############################## check_snmp_load #################
+-# Version : 1.3.2
+-# Date : Jan 16 2007
++my $Version='1.12';
++# Date : Oct 12 2007
+ # Author  : Patrick Proy ( patrick at proy.org)
+-# Help : http://www.manubulon.com/nagios/
++# Help : http://nagios.manubulon.com/
+ # Licence : GPL - http://www.fsf.org/licenses/gpl.txt
+-# Changelog : HP-UX load added.
+ # Contributors : F. Lacroix and many others !!!
+ #################################################################
+ #
+@@ -18,10 +17,8 @@
+ 
+ # Nagios specific
+ 
+-use lib "/usr/local/nagios/libexec";
+-use utils qw(%ERRORS $TIMEOUT);
+-#my $TIMEOUT = 15;
+-#my %ERRORS=('OK'=>0,'WARNING'=>1,'CRITICAL'=>2,'UNKNOWN'=>3,'DEPENDENT'=>4);
++my $TIMEOUT = 15;
++my %ERRORS=('OK'=>0,'WARNING'=>1,'CRITICAL'=>2,'UNKNOWN'=>3,'DEPENDENT'=>4);
+ 
+ # SNMP Datas
+ 
+@@ -94,7 +91,6 @@
+ 
+ # Globals
+ 
+-my $Version='1.3.2';
+ 
+ my $o_host = 	undef; 		# hostname
+ my $o_community = undef; 	# community
+## 04_check_snmp_process by Jan Wagner <waja@cyconet.org>
+##
+## DP: Update script to version 1.10
+
+diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_process.pl nagios-snmp-plugins-1.1.1/check_snmp_process.pl
+--- nagios-snmp-plugins-1.1.1.orig/check_snmp_process.pl	2007-03-12 21:36:02.000000000 +0100
++++ nagios-snmp-plugins-1.1.1/check_snmp_process.pl	2007-10-12 22:23:24.000000000 +0200
+@@ -1,45 +1,43 @@
+ #!/usr/bin/perl -w
+ ############################## check_snmp_process ##############
+-# Version : 1.4
+-# Date : March 12 2007
+-# Author  : Patrick Proy (patrick at proy.org)
++my $Version='1.10';
++# Date : Oct 12 2007
++# Author  : Patrick Proy (patrick at proy dot org)
+ # Help : http://nagios.manubulon.com
+ # Licence : GPL - http://www.fsf.org/licenses/gpl.txt
+-# Contrib : Makina Corpus
++# Contrib : Makina Corpus, adam At greekattic d0t com
+ # TODO : put $o_delta as an option
+-# Contrib : 
++# 	 If testing on localhost, selects itself....
+ ###############################################################
+ #
+ # help : ./check_snmp_process -h
+ 
++use strict;
++use Net::SNMP;
++use Getopt::Long;
++
+ ############### BASE DIRECTORY FOR TEMP FILE ########
+ my $o_base_dir="/tmp/tmp_Nagios_proc.";
+ my $file_history=200;   # number of data to keep in files.
+ my $delta_of_time_to_make_average=300;  # 5minutes by default
+- 
+-use strict;
+-use Net::SNMP;
+-use Getopt::Long;
+ 
+ # Nagios specific
+ 
+-use lib "/usr/local/nagios/libexec";
+-use utils qw(%ERRORS $TIMEOUT);
+-#my $TIMEOUT = 5;
+-#my %ERRORS=('OK'=>0,'WARNING'=>1,'CRITICAL'=>2,'UNKNOWN'=>3,'DEPENDENT'=>4);
++my $TIMEOUT = 15;
++my %ERRORS=('OK'=>0,'WARNING'=>1,'CRITICAL'=>2,'UNKNOWN'=>3,'DEPENDENT'=>4);
+ 
+ # SNMP Datas
+ my $process_table= '1.3.6.1.2.1.25.4.2.1';
+ my $index_table = '1.3.6.1.2.1.25.4.2.1.1';
+ my $run_name_table = '1.3.6.1.2.1.25.4.2.1.2';
+ my $run_path_table = '1.3.6.1.2.1.25.4.2.1.4';
++my $run_param_table = '1.3.6.1.2.1.25.4.2.1.5';
+ my $proc_mem_table = '1.3.6.1.2.1.25.5.1.1.2'; # Kbytes
+ my $proc_cpu_table = '1.3.6.1.2.1.25.5.1.1.1'; # Centi sec of CPU
+ my $proc_run_state = '1.3.6.1.2.1.25.4.2.1.7';
+ 
+ # Globals
+ 
+-my $Version='1.4';
+ 
+ my $o_host = 	undef; 		# hostname 
+ my $o_community =undef; 	# community 
+@@ -57,6 +55,8 @@
+ my $o_path=	undef;		# check path instead of name
+ my $o_inverse=	undef;		# checks max instead of min number of process
+ my $o_get_all=	undef;		# get all tables at once
++my $o_param=	undef;		# Add process parameters for selection 
++my $o_perf=	undef;		# Add performance output
+ my $o_timeout=  5;            	# Default 5s Timeout
+ # SNMP V3 specific
+ my $o_login=	undef;		# snmp v3 login
+@@ -80,7 +80,7 @@
+ sub p_version { print "check_snmp_process version : $Version\n"; }
+ 
+ sub print_usage {
+-    print "Usage: $0 [-v] -H <host> -C <snmp_community> [-2] | (-l login -x passwd) [-p <port>] -n <name> [-w <min_proc>[,<max_proc>] -c <min_proc>[,max_proc] ] [-m<warn Mb>,<crit Mb> -a -u<warn %>,<crit%> ] [-t <timeout>] [-o <octet_length>] [-f ] [-r] [-V] [-g]\n";
++    print "Usage: $0 [-v] -H <host> -C <snmp_community> [-2] | (-l login -x passwd) [-p <port>] -n <name> [-w <min_proc>[,<max_proc>] -c <min_proc>[,max_proc] ] [-m<warn Mb>,<crit Mb> -a -u<warn %>,<crit%> -d<delta> ] [-t <timeout>] [-o <octet_length>] [-f -A -F ] [-r] [-V] [-g]\n";
+ }
+ 
+ sub isnotnum { # Return true if arg is not a number
+@@ -174,6 +174,12 @@
+ -f, --fullpath
+    Use full path name instead of process name 
+    (Windows doesn't provide full path name)
++-A, --param
++   Add parameters to select processes.
++   ex : "named.*-t /var/named/chroot" will only select named process with this parameter 
++-F, --perfout
++   Add performance output
++   outputs : memory_usage, num_process, cpu_usage
+ -w, --warn=MIN[,MAX]
+    Number of process that will cause a warning 
+    -1 for no warning, MAX must be >0. Ex : -w-1,50
+@@ -193,6 +199,8 @@
+    checks cpu usage of all process
+    values are warning and critical values in % of CPU usage
+    if more than one CPU, value can be > 100% : 100%=1 CPU
++-d, --delta=seconds
++   make an average of <delta> seconds for CPU (default 300=5min)   
+ -g, --getall
+   In some cases, it is necessary to get all data at once because
+   process die very frequently.
+@@ -242,6 +250,9 @@
+ 		'2'	=> \$o_version2,	'v2c'		=> \$o_version2,
+ 		'o:i'   => \$o_octetlength,    	'octetlength:i' => \$o_octetlength,
+ 		'g'   	=> \$o_get_all,       	'getall'      	=> \$o_get_all,
++		'A'     => \$o_param,         'param'       => \$o_param,
++		'F'     => \$o_perf,         'perfout'       => \$o_perf,
++        'd:i'   => \$o_delta,           'delta:i'       => \$o_delta,		
+ 		'V'     => \$o_version,         'version'       => \$o_version
+     );
+     if (defined ($o_help)) { help(); exit $ERRORS{"UNKNOWN"}};
+@@ -411,6 +422,19 @@
+    exit $ERRORS{"UNKNOWN"};
+ }
+ 
++my $resultat_param=undef;
++if (defined($o_param)) { # Get parameter table too
++    $resultat_param = (Net::SNMP->VERSION < 4) ?
++        $session->get_table($run_param_table)
++        :$session->get_table(Baseoid => $run_param_table);
++   if (!defined($resultat_param)) {
++      printf("ERROR: Process param table : %s.\n", $session->error);
++      $session->close;
++      exit $ERRORS{"UNKNOWN"};
++   }
++   
++}
++
+ if (defined ($o_get_all)) {
+   $getall_run = (Net::SNMP->VERSION < 4) ?
+ 	$session->get_table($proc_run_state )
+@@ -458,8 +482,14 @@
+ verb("Filter : $o_descr");
+ 
+ foreach my $key ( keys %$resultat) {
+-   verb("OID : $key, Desc : $$resultat{$key}");
+    # test by regexp or exact match
++   # First add param if necessary
++   if (defined($o_param)){
++	my $pid = (split /\./,$key)[-1];
++	$pid = $run_param_table .".".$pid;
++        $$resultat{$key} .= " " . $$resultat_param{$pid};
++   }
++   verb("OID : $key, Desc : $$resultat{$key}");
+    my $test = defined($o_noreg)
+                 ? $$resultat{$key} eq $o_descr
+                 : $$resultat{$key} =~ /$o_descr/;
+@@ -545,6 +575,7 @@
+ }
+ 
+ my $final_status=0;
++my $perf_output;
+ my ($res_memory,$res_cpu)=(0,0);
+ my $memory_print="";
+ my $cpu_print="";
+@@ -571,6 +602,9 @@
+  } else {
+    $memory_print=", Mem : ".sprintf("%.1f",$res_memory)."Mb OK";
+  }
++ if (defined($o_perf)) {
++	$perf_output= "'memory_usage'=".sprintf("%.1f",$res_memory) ."MB;".$o_memL[0].";".$o_memL[1];
++ }
+ }
+ 
+ ######## Checks CPU usage
+@@ -609,6 +643,10 @@
+         if ($file_values[$j][0] > $trigger_low) {
+           # found value = centiseconds / seconds = %cpu
+           $found_value= ($res_cpu-$file_values[$j][1]) / ($timenow - $file_values[$j][0] );
++	  if ($found_value <0) { # in case of program restart
++		$j=0;$found_value=undef; # don't look for more values
++		$n_rows=0; # reset file
++	  }
+         }
+       }
+       $j--;
+@@ -631,6 +669,10 @@
+     } else {
+       $cpu_print.=", Cpu : ".sprintf("%.0f",$found_value)."% OK";
+     }
++	if (defined($o_perf)) {
++		if (!defined($perf_output)) {$perf_output="";} else {$perf_output.=" ";}
++		$perf_output.= "'cpu_usage'=". sprintf("%.0f",$found_value)."%;".$o_cpuL[0].";".$o_cpuL[1];
++	}
+   } else {
+     if ($final_status==0) { $final_status=3 };
+     $cpu_print.=", No data for CPU (".$n_rows." line(s)):UNKNOWN";
+@@ -659,7 +701,14 @@
+    print " (<= ",$o_warnL[1],"):OK";
+ }
+ 
+-print $memory_print,$cpu_print,"\n";
++print $memory_print,$cpu_print;
++
++if (defined($o_perf)) {
++	if (!defined($perf_output)) {$perf_output="";} else {$perf_output.=" ";}
++	$perf_output.= "'num_process'=". $num_int_ok.";".$o_warnL[0].";".$o_critL[0];
++	print " | ",$perf_output;
++}
++print "\n";
+ 
+ if ($final_status==2) { exit $ERRORS{"CRITICAL"};}
+ if ($final_status==1) { exit $ERRORS{"WARNING"};}
+## 05_check_snmp_storage by Jan Wagner <waja@cyconet.org>
+##
+## DP: Update script to version 1.3.3 
+
+diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_storage.pl nagios-snmp-plugins-1.1.1/check_snmp_storage.pl
+--- nagios-snmp-plugins-1.1.1.orig/check_snmp_storage.pl	2007-03-12 22:01:36.000000000 +0100
++++ nagios-snmp-plugins-1.1.1/check_snmp_storage.pl	2007-10-12 22:23:24.000000000 +0200
+@@ -1,12 +1,12 @@
+ #!/usr/bin/perl -w
+ ############################## check_snmp_storage ##############
+-# Version : 1.3.2
+-# Date :  March 12 2007
++# Version : 1.3.3
++# Date :  Jun 1 2007
+ # Author  : Patrick Proy ( patrick at proy.org)
+ # Help : http://nagios.manubulon.com
+ # Licence : GPL - http://www.fsf.org/licenses/gpl.txt
+ # TODO : 
+-# Contribs : Dimo Velev, Makina Corpus
++# Contribs : Dimo Velev, Makina Corpus, A. Greiner-Bär
+ #################################################################
+ #
+ # help : ./check_snmp_storage -h
+@@ -57,7 +57,7 @@
+ # Globals
+ 
+ my $Name='check_snmp_storage';
+-my $Version='1.3.2';
++my $Version='1.3.3';
+ 
+ my $o_host = 	undef; 		# hostname 
+ my $o_community = undef; 	# community 
+@@ -80,6 +80,8 @@
+ my $o_perf=	undef;		# Output performance data
+ my $o_short=	undef;	# Short output parameters
+ my @o_shortL=	undef;		# output type,where,cut
++my $o_reserve=	0;              # % reserved blocks (A. Greiner-Bär patch)
++my $o_giga=		undef;	# output and levels in gigabytes instead of megabytes
+ # SNMPv3 specific
+ my $o_login=	undef;		# Login for snmpv3
+ my $o_passwd=	undef;		# Pass for snmpv3
+@@ -95,7 +97,7 @@
+ sub p_version { print "$Name version : $Version\n"; }
+ 
+ sub print_usage {
+-    print "Usage: $Name [-v] -H <host> -C <snmp_community> [-2] | (-l login -x passwd [-X pass -L <authp>,<privp>]) [-p <port>] -m <name in desc_oid> [-q storagetype] -w <warn_level> -c <crit_level> [-t <timeout>] [-T pl|pu|bl|bu ] [-r] [-s] [-i] [-e] [-S 0|1[,1,<car>]] [-o <octet_length>]\n";
++    print "Usage: $Name [-v] -H <host> -C <snmp_community> [-2] | (-l login -x passwd [-X pass -L <authp>,<privp>]) [-p <port>] -m <name in desc_oid> [-q storagetype] -w <warn_level> -c <crit_level> [-t <timeout>] [-T pl|pu|bl|bu ] [-r -s -i -G] [-e] [-S 0|1[,1,<car>]] [-o <octet_length>] [-R <% reserved>]\n";
+ }
+ 
+ sub round ($$) {
+@@ -122,7 +124,7 @@
+ 
+ sub help {
+    print "\nSNMP Disk Monitor for Nagios version ",$Version,"\n";
+-   print "(c)2004-2006 Patrick Proy\n\n";
++   print "(c)2004-2007 Patrick Proy\n\n";
+    print_usage();
+    print <<EOT;
+ By default, plugin will monitor %used on drives :
+@@ -135,7 +137,7 @@
+    name or IP address of host to check
+ -C, --community=COMMUNITY NAME
+    community name for the host's SNMP agent (implies SNMP v1)
+-2, --v2c
++-2, --v2c
+    Use snmp v2c
+ -l, --login=LOGIN ; -x, --passwd=PASSWD
+    Login and auth password for snmpv3 authentication 
+@@ -179,6 +181,11 @@
+ -c, --critical=INTEGER
+    percent / MB of disk used to generate CRITICAL state
+    you can add the % sign 
++-R, --reserved=INTEGER
++   % reserved blocks for superuser
++   For ext2/3 filesystems, it is 5% by default
++-G, --gigabyte
++   output, warning & critical levels in gigabytes
+ -f, --perfparse
+    Perfparse compatible output
+ -S, --short=<type>[,<where>,<cut>]
+@@ -245,7 +252,9 @@
+ 		'q:s'  	=> \$o_storagetype,	'storagetype:s'=> \$o_storagetype,
+ 	'S:s'   => \$o_short,         	'short:s'       => \$o_short,
+ 	'o:i'   => \$o_octetlength,    	'octetlength:i' => \$o_octetlength,
+-	'f'	=> \$o_perf,		'perfparse'	=> \$o_perf
++	'f'	=> \$o_perf,		'perfparse'	=> \$o_perf,
++	'R:i'	=> \$o_reserve,	        'reserved:i'	=> \$o_reserve,
++	'G'	=> \$o_giga,	        'gigabyte'	=> \$o_giga
+     );
+     if (defined($o_help) ) { help(); exit $ERRORS{"UNKNOWN"}};
+     if (defined($o_version) ) { p_version(); exit $ERRORS{"UNKNOWN"}};
+@@ -271,6 +280,9 @@
+     # Check compulsory attributes
+     if ( ! defined($o_descr) ||  ! defined($o_host) || !defined($o_warn) || 
+ 	!defined($o_crit)) { print_usage(); exit $ERRORS{"UNKNOWN"}};
++    # Get rid of % sign if any
++    $o_warn =~ s/\%//; 
++    $o_crit =~ s/\%//;
+     # Check for positive numbers
+     if (($o_warn < 0) || ($o_crit < 0)) { print " warn and critical > 0 \n";print_usage(); exit $ERRORS{"UNKNOWN"}};
+     # check if warn or crit  in % and MB is tested
+@@ -278,9 +290,6 @@
+ 	print "warning or critical cannot be in % when MB are tested\n";
+ 	print_usage(); exit $ERRORS{"UNKNOWN"};
+     }
+-    # Get rid of % sign
+-    $o_warn =~ s/\%//; 
+-    $o_crit =~ s/\%//;
+     # Check warning and critical values
+     if ( ( $o_type eq 'pu' ) || ( $o_type eq 'bu' )) {
+ 	if ($o_warn >= $o_crit) { print " warn < crit if type=",$o_type,"\n";print_usage(); exit $ERRORS{"UNKNOWN"}};
+@@ -306,6 +315,10 @@
+     if (defined ($o_octetlength) && (isnnum($o_octetlength) || $o_octetlength > 65535 || $o_octetlength < 484 )) {
+ 		print "octet lenght must be < 65535 and > 484\n";print_usage(); exit $ERRORS{"UNKNOWN"};
+     }	
++    #### reserved blocks checks (A. Greiner-Bär patch).
++    if (defined ($o_reserve) && (isnnum($o_reserve) || $o_reserve > 99 || $o_reserve < 0 )) {
++		print "reserved blocks must be < 100 and >= 0\n";print_usage(); exit $ERRORS{"UNKNOWN"};
++    }
+ }
+ 
+ ########## MAIN #######
+@@ -521,21 +534,35 @@
+ my $crit_state=0;
+ my ($p_warn,$p_crit);
+ my $output=undef;
++my $output_metric_val = 1024**2;
++my $output_metric = "M";
++# Set the metric 
++if (defined($o_giga)) {
++	$output_metric_val *= 1024;
++	$output_metric='G';
++}
++
+ for ($i=0;$i<$num_int;$i++) {
+   verb("Descr : $descr[$i]");
+   verb("Size :  $$result{$size_table . $tindex[$i]}");
+   verb("Used : $$result{$used_table . $tindex[$i]}");
+   verb("Alloc : $$result{$alloc_units . $tindex[$i]}");
+-  my $to = $$result{$size_table . $tindex[$i]} * $$result{$alloc_units . $tindex[$i]} / 1024**2;
++  if (!defined($$result{$size_table . $tindex[$i]}) || 
++	!defined($$result{$used_table . $tindex[$i]}) || 
++	!defined ($$result{$alloc_units . $tindex[$i]})) {
++     print "Data not fully defined for storage ",$descr[$i]," : UNKNOWN\n";
++     exit $ERRORS{"UNKNOWN"};
++  }
++  my $to = $$result{$size_table . $tindex[$i]} * ( ( 100 - $o_reserve ) / 100 ) * $$result{$alloc_units . $tindex[$i]} / $output_metric_val;
+   my $pu=undef;
+   if ( $$result{$used_table . $tindex[$i]} != 0 ) {
+-    $pu = $$result{$used_table . $tindex[$i]}*100 / $$result{$size_table . $tindex[$i]};
++	$pu = $$result{$used_table . $tindex[$i]}* 100 /  ( $$result{$size_table . $tindex[$i]} * ( 100 - $o_reserve ) / 100 );
+   }else {
+     $pu=0;
+   } 
+-  my $bu = $$result{$used_table . $tindex[$i]} *  $$result{$alloc_units . $tindex[$i]} / 1024**2;
++  my $bu = $$result{$used_table . $tindex[$i]} *  $$result{$alloc_units . $tindex[$i]} / $output_metric_val;
+   my $pl = 100 - $pu;
+-  my $bl = ($$result{$size_table . $tindex[$i]}- $$result{$used_table . $tindex[$i]}) * $$result{$alloc_units . $tindex[$i]} / 1024**2;
++  my $bl = ( ( $$result{$size_table . $tindex[$i]} * ( ( 100 - $o_reserve ) / 100 ) - ( $$result{$used_table . $tindex[$i]} ) ) * $$result{$alloc_units . $tindex[$i]} / $output_metric_val );
+   # add a ' ' if some data exists in $perf_out
+   $perf_out .= " " if (defined ($perf_out)) ;
+   ##### Ouputs and checks
+@@ -554,7 +581,7 @@
+ 	   || (($pu >= $o_warn) && ($locstate=$warn_state=1));
+ 	if (defined($o_shortL[2])) {}
+ 	if (!defined($o_shortL[0]) || ($locstate==1)) { # print full output if warn or critical state
+-	  $output.=sprintf ("%s: %.0f%%used(%.0fMB/%.0fMB) ",$descr[$i],$pu,$bu,$to);
++	  $output.=sprintf ("%s: %.0f%%used(%.0f%sB/%.0f%sB) ",$descr[$i],$pu,$bu,$output_metric,$to,$output_metric);
+     } elsif ($o_shortL[0] == 1) {
+ 	  $output.=sprintf ("%s: %.0f%% ",$descr[$i],$pu);
+ 	} 
+@@ -566,9 +593,9 @@
+     ( ($bu >= $o_crit) && ($locstate=$crit_state=1) ) 
+ 	  || ( ($bu >= $o_warn) && ($locstate=$warn_state=1) );
+ 	if (!defined($o_shortL[0]) || ($locstate==1)) { # print full output if warn or critical state
+-      $output.=sprintf("%s: %.0fMBused/%.0fMB (%.0f%%) ",$descr[$i],$bu,$to,$pu);
++      $output.=sprintf("%s: %.0f%sBused/%.0f%sB (%.0f%%) ",$descr[$i],$bu,$output_metric,$to,$output_metric,$pu);
+     } elsif ($o_shortL[0] == 1) {
+-	  $output.=sprintf("%s: %.0fMB ",$descr[$i],$bu);
++	  $output.=sprintf("%s: %.0f%sB ",$descr[$i],$bu,$output_metric);
+     } 
+  }
+  
+@@ -578,9 +605,9 @@
+     ( ($bl <= $o_crit) && ($locstate=$crit_state=1) ) 
+ 	  || ( ($bl <= $o_warn) && ($locstate=$warn_state=1) );
+ 	if (!defined($o_shortL[0]) || ($locstate==1)) { # print full output if warn or critical state
+-      $output.=sprintf ("%s: %.0fMBleft/%.0fMB (%.0f%%) ",$descr[$i],$bl,$to,$pl);
++      $output.=sprintf ("%s: %.0f%sBleft/%.0f%sB (%.0f%%) ",$descr[$i],$bl,$output_metric,$to,$output_metric,$pl);
+     } elsif ($o_shortL[0] == 1) {
+-	  $output.=sprintf ("%s: %.0fMB ",$descr[$i],$bl);
++	  $output.=sprintf ("%s: %.0f%sB ",$descr[$i],$bl,$output_metric);
+     } 
+  }
+   
+@@ -590,13 +617,13 @@
+     ( ($pl <= $o_crit) && ($locstate=$crit_state=1) ) 
+ 	  || ( ($pl <= $o_warn) && ($locstate=$warn_state=1) );
+ 	if (!defined($o_shortL[0]) || ($locstate==1)) { # print full output if warn or critical state
+-      $output.=sprintf ("%s: %.0f%%left(%.0fMB/%.0fMB) ",$descr[$i],$pl,$bl,$to);
++      $output.=sprintf ("%s: %.0f%%left(%.0f%sB/%.0f%sB) ",$descr[$i],$pl,$bl,$output_metric,$to,$output_metric);
+     } elsif ($o_shortL[0] == 1) {
+ 	  $output.=sprintf ("%s: %.0f%% ",$descr[$i],$pl);
+     } 
+   }
+   # Performance output (in MB)
+-  $perf_out .= "'".$Pdescr. "'=" . round($bu,0) . "MB;" . round($p_warn,0) 
++  $perf_out .= "'".$Pdescr. "'=" . round($bu,0) . $output_metric ."B;" . round($p_warn,0) 
+ 	       . ";" . round($p_crit,0) . ";0;" . round($to,0);
+ }
+ 
+@@ -606,8 +633,8 @@
+ my $comp_unit=undef;
+ ($o_type eq "pu") && ($comp_oper ="<") && ($comp_unit ="%");
+ ($o_type eq "pl") && ($comp_oper =">") && ($comp_unit ="%");
+-($o_type eq "bu") && ($comp_oper ="<") && ($comp_unit ="MB");
+-($o_type eq 'bl') && ($comp_oper =">") && ($comp_unit ="MB");
++($o_type eq "bu") && ($comp_oper ="<") && ($comp_unit = $output_metric."B");
++($o_type eq 'bl') && ($comp_oper =">") && ($comp_unit =$output_metric."B");
+ 
+ if (!defined ($output)) { $output="All selected storages "; }
+ 
+## 06_check_snmp_win by Jan Wagner <waja@cyconet.org>
+##
+## DP: Update script to version 1.1 
+
+diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_win.pl nagios-snmp-plugins-1.1.1/check_snmp_win.pl
+--- nagios-snmp-plugins-1.1.1.orig/check_snmp_win.pl	2006-11-29 20:59:55.000000000 +0100
++++ nagios-snmp-plugins-1.1.1/check_snmp_win.pl	2007-10-12 22:23:25.000000000 +0200
+@@ -1,10 +1,11 @@
+ #!/usr/bin/perl -w
+ ############################## check_snmp_win ##############
+-# Version : 0.6
+-# Date : Nov 29 2006 
++my $Version='1.1';
++# Date : Oct 12 2007
+ # Author  : Patrick Proy (patrick at proy.org)
+-# Help : http://www.manubulon.com/nagios/
++# Help : http://nagios.manubulon.com/
+ # Licence : GPL - http://www.fsf.org/licenses/gpl.txt
++# Contrib : Tenaku
+ # TODO : 
+ ###############################################################
+ #
+@@ -16,10 +17,10 @@
+ 
+ # Nagios specific
+ 
+-use lib "/usr/local/nagios/libexec";
+-use utils qw(%ERRORS $TIMEOUT);
+-#my $TIMEOUT = 5;
+-#my %ERRORS=('OK'=>0,'WARNING'=>1,'CRITICAL'=>2,'UNKNOWN'=>3,'DEPENDENT'=>4);
++#use lib "/usr/local/nagios/libexec";
++#use utils qw(%ERRORS $TIMEOUT);
++my $TIMEOUT = 15;
++my %ERRORS=('OK'=>0,'WARNING'=>1,'CRITICAL'=>2,'UNKNOWN'=>3,'DEPENDENT'=>4);
+ 
+ # SNMP Datas for processes (MIB II)
+ my $process_table= '1.3.6.1.2.1.25.4.2.1';
+@@ -44,7 +45,6 @@
+ 
+ # Globals
+ 
+-my $Version='0.6';
+ my $Name='check_snmp_win';
+ 
+ my $o_host = 	undef; 		# hostname 
+@@ -93,7 +93,7 @@
+ 
+ sub help {
+    print "\nSNMP Windows Monitor for Nagios version ",$Version,"\n";
+-   print "GPL licence, (c)2004-2005 Patrick Proy\n\n";
++   print "GPL licence, (c)2004-2007 Patrick Proy\n\n";
+    print_usage();
+    print <<EOT;
+ -v, --verbose
+@@ -344,7 +344,11 @@
+ foreach my $List (@o_descrL) {
+   my $test=0;
+   for (my $i=0; $i< $num_int; $i++) {
+-    if ( $descr[$i] =~ /$List/i  ) { $test++; }
++    if (defined($o_noreg)){
++      if ($descr[$i] eq $List) { $test++;}
++    } else {
++      if ( $descr[$i] =~ /$List/i ) { $test++; }
++    }
+   }
+   if ($test==0) {
+     $output .= ", " if defined($output);
