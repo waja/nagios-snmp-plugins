@@ -11,7 +11,10 @@ NP_LIBEXEC:=/usr/lib/nagios/plugins
 plugin_cfgs:=snmp_cpfw snmp_env snmp_int snmp_load snmp_mem snmp_process \
 	snmp_storage snmp_vrrp snmp_win
 
-build:
+build: build-arch build-indep
+build-arch: build-stamp
+build-indep: build-stamp
+build-stamp:
 
 clean:
 	dh_testdir
