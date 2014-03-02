@@ -1,7 +1,6 @@
 ## 15_check_snmp_storage_64bit by Martin Fürstenau
 ##
-## DP: Fixing Net::SNMP version
-## DP: (see https://wiki.icinga.org/display/howtos/check_snmp#checksnmp-Argumentv601isntnumericinnumericlt)
+## DP: Make check_snmp_storage 64 Bit prrof
 
 ## From 144c57a0adda190000bef500f3274425cb90d6ba Mon Sep 17 00:00:00 2001
 ## From: Michael Friedrich <michael.friedrich@gmail.com>
