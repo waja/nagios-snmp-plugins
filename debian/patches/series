@@ -2,5 +2,6 @@
 10_fix_net_snmp_version
 15_check_snmp_storage_64bit
 16_perfdata
+17_protocol_fam
 50_disable_epn
 51_fix_privacy_doc
