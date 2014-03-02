@@ -1,0 +1,21 @@
+nagios-snmp-plugins (1.1.1-8) unstable; urgency=low
+
+  The following plugins are using now '-p' to specify the port and '-P' the
+  protocol:
+
+  - check_snmp_load
+  - check_snmp_mem
+  - check_snmp_process
+  - check_snmp_storage
+
+  The port is specified with '-p' now and the protocol with '-P':
+
+   Network protocol to be used
+    ['udp/ipv4'] : UDP over IPv4
+     'udp/ipv6'  : UDP over IPv6
+     'tcp/ipv4'  : TCP over IPv4
+     'tcp/ipv6'  : TCP over IPv6
+
+  Network protocol (Default udp/ipv4)
+
+ -- Jan Wagner <waja@cyconet.org>  Sun, 02 Mar 2014 23:45:13 +0100
