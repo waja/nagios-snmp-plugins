@@ -1,9 +1,249 @@
-## 01_check_snmp_env by Jan Wagner <waja@cyconet.org>
-##
-## DP: Fix some issues via cvs version
-
---- old/check_snmp_env.pl	2007-07-04 09:46:55.000000000 +0200
-+++ new/check_snmp_env.pl	2007-07-06 22:17:06.000000000 +0200
+diff -Nur nagios_plugins/Changelog plugins/Changelog
+--- nagios_plugins/Changelog	2007-04-23 15:15:40.000000000 +0200
++++ plugins/Changelog	2007-10-20 13:26:06.000000000 +0200
+@@ -1,4 +1,38 @@
+ ################################
++Release 1.1.2 / Jun 2007 : 
++
++Scripts, actual CVS version and changelog :
++check_snmp_mem.pl : 1.3
++check_snmp_vrrp.pl : 1.3
++check_snmp_linkproof_nhr.pl : 1.1
++check_snmp_process.pl : 1.7
++	- Added option to select process with his parameter
++	- Added option for performance output
++	- Corrected negative CPU when process restarts
++	- Added delta option for cpu average (-d option)
++check_snmp_boostedge.pl : 1.2 
++check_snmp_nsbox.pl : 1.2 
++check_snmp_css_main.pl : 1.1
++check_snmp_cpfw.pl : 1.7
++check_snmp_int.pl : 1.22
++	- Correct speed query for interface > 4 Gbps
++	- Reduced snmp queries to 2 instead of 3 when perf data is on
++	- Bad maximum in perfdata when in Bps
++	- Added option to make dormant state OK
++check_snmp_storage.pl : 1.10
++	- Return an UNKNOWN status when size/used/alloc is not defined in snmp
++	- Patch from Alexander Greiner-B?r to remove the reserved disk space for superuser on ext2/3 FS.
++	  New -R option for this
++	- Added -G (giga) option for output & levels in Gigabytes
++check_snmp_win.pl : 0.6
++check_snmp_css.pl : 1.3
++check_snmp_env.pl : 1.8
++	- Added test to check existence of some OIDs
++check_snmp_load.pl : 1.11
++	- Corrected bug in performance output
++	- Added SIG{ALRM} sub and % sign in output
++
++################################
+ Release 1.1.1 / April 2007 : 
+ 
+ Added documentation in doc/ directory : (html format).
+diff -Nur nagios_plugins/INSTALL plugins/INSTALL
+--- nagios_plugins/INSTALL	1970-01-01 01:00:00.000000000 +0100
++++ plugins/INSTALL	2007-10-20 13:26:06.000000000 +0200
+@@ -0,0 +1,15 @@
++Installation:
++-------------
++
++You can simply copy the .pl files to the Nagios Plugin directory if 
++- Nagios plugins and utils.pm file are in /usr/local/nagios/libexec.
++- You are sure Net::SNMP is installed. (Getopt::Long is standard).
++- perl is in /usr/bin/perl
++- Temp files can be written by Nagios in /tmp
++
++You can also use the "install.sh" script provided in this directory to install the plugins.
++Type : "./install.sh" to install all the plugins or "./install.sh <plugin name>" for a specific one.
++
++The script will check for dependencies and ask for Nagios and temp directories.
++It will modify the scripts depending on these answers and install the scripts. 
++
+diff -Nur nagios_plugins/README plugins/README
+--- nagios_plugins/README	2007-04-20 17:04:08.000000000 +0200
++++ plugins/README	2007-10-20 13:26:06.000000000 +0200
+@@ -1,4 +1,4 @@
+-Nagios SNMP plugins 1.1.1 README
++Nagios SNMP plugins 1.1.2 README
+ ------------------------------
+ 
+ 
+@@ -32,7 +32,7 @@
+ Legal stuff:
+ ------------
+ 
+-    Nagios SNMP plugins version 1.1.1, Copyright (C) 2004-2007 Patrick Proy (nagios at proy.org)
++    Nagios SNMP plugins version 1.1.2, Copyright (C) 2004-2007 Patrick Proy (nagios at proy.org)
+ 
+     This program is free software; you can redistribute it and/or modify 
+     it under the terms of the GNU General Public License version 2 as 
+diff -Nur nagios_plugins/check_snmp_cpfw.pl plugins/check_snmp_cpfw.pl
+--- nagios_plugins/check_snmp_cpfw.pl	2007-04-20 00:03:30.000000000 +0200
++++ plugins/check_snmp_cpfw.pl	2007-10-20 13:26:06.000000000 +0200
+@@ -1,10 +1,11 @@
+ #!/usr/bin/perl -w 
+ ############################## check_snmp_cpfw ##############
+-# Version : 1.2.1
+-# Date : April 19 2007
++my $Version='1.8';
++# Date : Oct 20 2007
+ # Author  : Patrick Proy (patrick at proy.org)
+ # Help : http://nagios.manubulon.com
+ # Licence : GPL - http://www.fsf.org/licenses/gpl.txt
++# Contrib : StaGue
+ # TODO : 
+ # - check sync method
+ #################################################################
+@@ -18,10 +19,8 @@
+ 
+ # Nagios specific
+ 
+-use lib "/usr/local/nagios/libexec";
+-use utils qw(%ERRORS $TIMEOUT);
+-#my $TIMEOUT = 15;
+-#my %ERRORS=('OK'=>0,'WARNING'=>1,'CRITICAL'=>2,'UNKNOWN'=>3,'DEPENDENT'=>4);
++my $TIMEOUT = 15;
++my %ERRORS=('OK'=>0,'WARNING'=>1,'CRITICAL'=>2,'UNKNOWN'=>3,'DEPENDENT'=>4);
+ 
+ ########### SNMP Datas ########### 
+ 
+@@ -73,8 +72,6 @@
+ 
+ #################################### Globals ##############################""
+ 
+-my $Version='1.2.1';
+-
+ my $o_host = 	undef; 		# hostname
+ my $o_community = undef; 	# community
+ my $o_version2	=undef;		# Version 2
+@@ -247,7 +244,7 @@
+ }
+ 
+ $SIG{'ALRM'} = sub {
+- print "No answer from host\n";
++ print "No answer from host $o_host:$o_port\n";
+  exit $ERRORS{"UNKNOWN"};
+ };
+ 
+@@ -332,15 +329,15 @@
+       }  
+     }
+   } else {
+-    $svn_print .= "cannot find oids";
++    $svn_print .= "cannot find OIDs";
+     #Critical state if not found because it means soft is not activated
+     $svn_state=2;
+   }
+ 
+   if ($svn_state == 0) {
+-    $svn_print="SVN : OK";
++    $svn_print="SVN: OK";
+   } else {
+-    $svn_print="SVN : " . $svn_print;
++    $svn_print="SVN: " . $svn_print;
+   }
+   verb("$svn_print");
+ }
+@@ -363,14 +360,14 @@
+       }
+     }
+   } else {
+-    $mgmt_print .= "cannot find oids";
++    $mgmt_print .= "cannot find OIDs";
+     #Critical state if not found because it means soft is not activated
+     $mgmt_state=2;
+   }  
+   if ($mgmt_state == 0) {
+-    $mgmt_print="MGMT : OK";
++    $mgmt_print="MGMT: OK";
+   } else {
+-    $mgmt_print="MGMT : " . $mgmt_print;
++    $mgmt_print="MGMT: " . $mgmt_print;
+   }
+   verb("$svn_print");
+ }
+@@ -402,7 +399,7 @@
+     if (defined($o_policy)) {
+       if ($$resultat{$policy_name} ne $o_policy) {
+ 	    $fw_state=2;
+-	    $fw_print .= "Policy installed : $$resultat{$policy_name}";
++	    $fw_print .= "Policy installed: $$resultat{$policy_name}";
+       }
+     }
+ 
+@@ -419,15 +416,15 @@
+       $perf_conn=$$resultat{$connections};
+     }
+   } else {
+-    $fw_print .= "cannot find oids";
++    $fw_print .= "cannot find OIDs";
+     #Critical state if not found because it means soft is not activated
+     $fw_state=2;
+   }
+ 
+   if ($fw_state==0) {
+-    $fw_print="FW : OK";
++    $fw_print="FW: OK";
+   } else {
+-    $fw_print="FW : " . $fw_print;
++    $fw_print="FW: " . $fw_print;
+   }
+ 
+ }
+@@ -460,7 +457,7 @@
+     }
+     #my $ha_mode		= "1.3.6.1.4.1.2620.1.5.11.0";  # "Sync only" : ha Working mode
+   } else {
+-    $ha_print .= "cannot find oids";
++    $ha_print .= "cannot find OIDs";
+     #Critical state if not found because it means soft is not activated
+     $ha_state_n=2;
+   }
+@@ -484,7 +481,7 @@
+       }
+     }
+   } else {
+-    $ha_print .= "cannot find oids" if ($ha_state_n ==0);
++    $ha_print .= "cannot find OIDs" if ($ha_state_n ==0);
+     #Critical state if not found because it means soft is not activated
+     $ha_state_n=2;
+   }
+@@ -513,9 +510,9 @@
+   }
+ 
+   if ($ha_state_n == 0) {
+-    $ha_print = "HA : OK";
++    $ha_print = "HA: OK";
+   } else {
+-    $ha_print = "HA : " . $ha_print;
++    $ha_print = "HA: " . $ha_print;
+   }
+ 
+ }
+@@ -532,9 +529,9 @@
+ if (defined ($o_mgmt)) { $f_print = (defined ($f_print)) ? $f_print . " / ". $mgmt_print : $mgmt_print }
+ 
+ my $exit_status=undef;
+-$f_print .= " / CPFW Status : ";
++$f_print .= " / CPFW Status: ";
+ if (($ha_state_n+$svn_state+$fw_state+$mgmt_state) == 0 ) {
+-  $f_print .= "OK";
++  $f_print .= "OK, " . $perf_conn . " conn.";
+   $exit_status= $ERRORS{"OK"}; 
+ } else {
+   if (($fw_state==1) || ($ha_state_n==1) || ($svn_state==1) || ($mgmt_state==1)) {
+@@ -547,7 +544,7 @@
+ }
+ 
+ if (defined($o_perf) && defined ($perf_conn)) {
+-  $f_print .= " | fw_connexions=" . $perf_conn;
++  $f_print .= " | fw_connexions=" . $perf_conn . ";" . $o_warn . ";" . $o_crit . ";0";
+ }
+ 
+ print "$f_print\n";
+diff -Nur nagios_plugins/check_snmp_env.pl plugins/check_snmp_env.pl
+--- nagios_plugins/check_snmp_env.pl	2007-04-20 11:45:22.000000000 +0200
++++ plugins/check_snmp_env.pl	2007-10-20 13:26:06.000000000 +0200
 @@ -1,7 +1,7 @@
  #!/usr/bin/perl -w 
  ############################## check_snmp_env #################
@@ -128,14 +368,9 @@
 +
 +print "Unknown check type : UNKNOWN\n";
 +exit $ERRORS{"UNKNOWN"};
-## 02_check_snmp_int by Jan Wagner <waja@cyconet.org>
-##
-## DP: Update script to version 1.24
-
-
-diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_int.pl nagios-snmp-plugins-1.1.1/check_snmp_int.pl
---- nagios-snmp-plugins-1.1.1.orig/check_snmp_int.pl	2007-04-23 11:40:39.000000000 +0200
-+++ nagios-snmp-plugins-1.1.1/check_snmp_int.pl	2007-10-12 22:23:22.000000000 +0200
+diff -Nur nagios_plugins/check_snmp_int.pl plugins/check_snmp_int.pl
+--- nagios_plugins/check_snmp_int.pl	2007-04-23 11:40:39.000000000 +0200
++++ plugins/check_snmp_int.pl	2007-10-20 13:26:06.000000000 +0200
 @@ -1,13 +1,12 @@
  #!/usr/bin/perl -w
  ############################## check_snmp_int ##############
@@ -500,13 +735,9 @@ diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_int.pl nagios-snmp-plugins-1
  	}
    } 
  }
-## 03_check_snmp_load by Jan Wagner <waja@cyconet.org>
-##
-## DP: Update script to version 1.12
-
-diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_load.pl nagios-snmp-plugins-1.1.1/check_snmp_load.pl
---- nagios-snmp-plugins-1.1.1.orig/check_snmp_load.pl	2007-04-16 19:41:20.000000000 +0200
-+++ nagios-snmp-plugins-1.1.1/check_snmp_load.pl	2007-10-12 22:23:23.000000000 +0200
+diff -Nur nagios_plugins/check_snmp_load.pl plugins/check_snmp_load.pl
+--- nagios_plugins/check_snmp_load.pl	2007-04-16 19:41:20.000000000 +0200
++++ plugins/check_snmp_load.pl	2007-10-20 13:26:06.000000000 +0200
 @@ -1,11 +1,10 @@
  #!/usr/bin/perl -w 
  ############################## check_snmp_load #################
@@ -543,13 +774,160 @@ diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_load.pl nagios-snmp-plugins-
  
  my $o_host = 	undef; 		# hostname
  my $o_community = undef; 	# community
-## 04_check_snmp_process by Jan Wagner <waja@cyconet.org>
-##
-## DP: Update script to version 1.10
-
-diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_process.pl nagios-snmp-plugins-1.1.1/check_snmp_process.pl
---- nagios-snmp-plugins-1.1.1.orig/check_snmp_process.pl	2007-03-12 21:36:02.000000000 +0100
-+++ nagios-snmp-plugins-1.1.1/check_snmp_process.pl	2007-10-12 22:23:24.000000000 +0200
+diff -Nur nagios_plugins/check_snmp_mem.pl plugins/check_snmp_mem.pl
+--- nagios_plugins/check_snmp_mem.pl	2006-07-09 22:52:37.000000000 +0200
++++ plugins/check_snmp_mem.pl	2007-10-20 13:26:06.000000000 +0200
+@@ -1,11 +1,11 @@
+ #!/usr/bin/perl -w 
+ ############################## check_snmp_mem ##############
+-# Version : 1.1
+-# Date : Jul 09 2006
++my $Version='1.5';
++# Date : 17 October 2007
+ # Author  : Patrick Proy (nagios at proy.org)
+-# Help : http://www.manubulon.com/nagios/
++# Help : http://nagios.manubulon.com/
+ # Licence : GPL - http://www.fsf.org/licenses/gpl.txt
+-# Contrib : Jan Jungmann
++# Contrib : Jan Jungmann, Patrick Griffin
+ # TODO : 
+ #################################################################
+ #
+@@ -18,10 +18,8 @@
+ 
+ # Nagios specific
+ 
+-use lib "/usr/local/nagios/libexec";
+-use utils qw(%ERRORS $TIMEOUT);
+-#my $TIMEOUT = 15;
+-#my %ERRORS=('OK'=>0,'WARNING'=>1,'CRITICAL'=>2,'UNKNOWN'=>3,'DEPENDENT'=>4);
++my $TIMEOUT = 15;
++my %ERRORS=('OK'=>0,'WARNING'=>1,'CRITICAL'=>2,'UNKNOWN'=>3,'DEPENDENT'=>4);
+ 
+ # SNMP Datas
+ 
+@@ -29,10 +27,11 @@
+ 
+ my $nets_ram_free	= "1.3.6.1.4.1.2021.4.6.0";  # Real memory free
+ my $nets_ram_total	= "1.3.6.1.4.1.2021.4.5.0";  # Real memory total
+-my $nets_ram_cache      = "1.3.6.1.4.1.2021.4.15.0"; # Real memory cached
++my $nets_ram_buffer	= "1.3.6.1.4.1.2021.4.14.0"; # Real memory buffered
++my $nets_ram_cache	= "1.3.6.1.4.1.2021.4.15.0"; # Real memory cached
+ my $nets_swap_free	= "1.3.6.1.4.1.2021.4.4.0";  # swap memory free
+ my $nets_swap_total	= "1.3.6.1.4.1.2021.4.3.0";  # Swap memory total
+-my @nets_oids		= ($nets_ram_free,$nets_ram_total,$nets_swap_free,$nets_swap_total,$nets_ram_cache);
++my @nets_oids		= ($nets_ram_free,$nets_ram_total,$nets_swap_free,$nets_swap_total,$nets_ram_cache,$nets_ram_buffer);
+ 
+ # Cisco 
+ 
+@@ -60,7 +59,6 @@
+ 
+ # Globals
+ 
+-my $Version='1.1';
+ 
+ my $o_host = 	undef; 		# hostname
+ my $o_community = undef; 	# community
+@@ -79,6 +77,7 @@
+ my $o_critS=	undef;		# critical level for swap
+ my $o_perf=	undef;		# Performance data option
+ my $o_cache=	undef;		# Include cached memory as used memory
++my $o_buffer=	undef;		# Exclude buffered memory as used memory
+ my $o_timeout=  undef; 		# Timeout (Default 5)
+ my $o_version2= undef;          # use snmp v2c
+ # SNMPv3 specific
+@@ -94,7 +93,7 @@
+ sub p_version { print "check_snmp_mem version : $Version\n"; }
+ 
+ sub print_usage {
+-    print "Usage: $0 [-v] -H <host> -C <snmp_community> [-2] | (-l login -x passwd [-X pass -L <authp>,<privp>])  [-p <port>] -w <warn level> -c <crit level> [-I|-N|-E] [-f] [-m] [-t <timeout>] [-V]\n";
++    print "Usage: $0 [-v] -H <host> -C <snmp_community> [-2] | (-l login -x passwd [-X pass -L <authp>,<privp>])  [-p <port>] -w <warn level> -c <crit level> [-I|-N|-E] [-f] [-m -b] [-t <timeout>] [-V]\n";
+ }
+ 
+ sub isnnum { # Return true if arg is not a number
+@@ -109,11 +108,11 @@
+ 
+ sub help {
+    print "\nSNMP Memory Monitor for Nagios version ",$Version,"\n";
+-   print "(c)2004-2006 to my cat Ratoune - Author: Patrick Proy\n\n";
++   print "GPL licence, (c)2004-2007 Patrick Proy\n\n";
+    print_usage();
+    print <<EOT;
+ -v, --verbose
+-   print extra debugging information (including interface list on the system)
++   print extra debugging information
+ -h, --help
+    print this help message
+ -H, --hostname=HOST
+@@ -144,6 +143,8 @@
+    check linux memory & swap provided by Net SNMP 
+ -m, --memcache
+    include cached memory in used memory (only with Net-SNMP)
++-b, --membuffer
++   exclude buffered memory in used memory (only with Net-SNMP)
+ -I, --cisco
+    check cisco memory (sum of all memory pools)
+ -E, --hp
+@@ -187,6 +188,7 @@
+         'c:s'   => \$o_crit,            'critical:s'    => \$o_crit,
+         'w:s'   => \$o_warn,            'warn:s'        => \$o_warn,
+         'm'   	=> \$o_cache,           'memcache'      => \$o_cache,
++       'b'     => \$o_buffer,          'membuffer'     => \$o_buffer,
+         'f'     => \$o_perf,            'perfdata'      => \$o_perf
+     );
+     if (defined ($o_help) ) { help(); exit $ERRORS{"UNKNOWN"}};
+@@ -267,6 +269,7 @@
+       -username		=> $o_login,
+       -authpassword	=> $o_passwd,
+       -authprotocol	=> $o_authproto,
++	  -port             => $o_port,
+       -timeout          => $o_timeout
+     );  
+   } else {
+@@ -279,6 +282,7 @@
+       -authprotocol	=> $o_authproto,
+       -privpassword	=> $o_privpass,
+ 	  -privprotocol => $o_privproto,
++	  -port             => $o_port,	  
+       -timeout      => $o_timeout
+     );
+   }
+@@ -473,22 +477,23 @@
+   }
+   
+   my ($realused,$swapused)=(undef,undef);
++  my $totalcachedbuffered = 0;
++  if (defined($o_buffer)) {
++    $totalcachedbuffered = $$resultat{$nets_ram_buffer};
++  }
++  if (!defined($o_cache)) {
++    $totalcachedbuffered = $totalcachedbuffered + $$resultat{$nets_ram_cache};
++  }
++  
++  $realused = ($$resultat{$nets_ram_total}-($$resultat{$nets_ram_free}+$totalcachedbuffered)) / $$resultat{$nets_ram_total};
+   
+-  $realused= defined($o_cache) ? 
+-    ($$resultat{$nets_ram_total}-$$resultat{$nets_ram_free})/$$resultat{$nets_ram_total}
+-  :
+-    ($$resultat{$nets_ram_total}-($$resultat{$nets_ram_free}+$$resultat{$nets_ram_cache}))/$$resultat{$nets_ram_total};
+-
+   if($$resultat{$nets_ram_total} == 0) { $realused = 0; }
+ 
+   $swapused= ($$resultat{$nets_swap_total} == 0) ? 0 :
+ 		($$resultat{$nets_swap_total}-$$resultat{$nets_swap_free})/$$resultat{$nets_swap_total}; 
+   $realused=round($realused*100,0);
+   $swapused=round($swapused*100,0);
+-  defined($o_cache) ? 
+-    verb ("Ram : $$resultat{$nets_ram_free} / $$resultat{$nets_ram_total} : $realused")
+-    :
+-    verb ("Ram : $$resultat{$nets_ram_free} ($$resultat{$nets_ram_cache} cached) / $$resultat{$nets_ram_total} : $realused");
++  verb ("Ram : $$resultat{$nets_ram_free} ($$resultat{$nets_ram_cache} cached, $$resultat{$nets_ram_buffer} buff) / $$resultat{$nets_ram_total} : $realused");
+   verb ("Swap : $$resultat{$nets_swap_free} / $$resultat{$nets_swap_total} : $swapused");
+   
+   my $n_status="OK";
+diff -Nur nagios_plugins/check_snmp_process.pl plugins/check_snmp_process.pl
+--- nagios_plugins/check_snmp_process.pl	2007-03-12 21:36:02.000000000 +0100
++++ plugins/check_snmp_process.pl	2007-10-20 13:26:06.000000000 +0200
 @@ -1,45 +1,43 @@
  #!/usr/bin/perl -w
  ############################## check_snmp_process ##############
@@ -750,13 +1128,9 @@ diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_process.pl nagios-snmp-plugi
  
  if ($final_status==2) { exit $ERRORS{"CRITICAL"};}
  if ($final_status==1) { exit $ERRORS{"WARNING"};}
-## 05_check_snmp_storage by Jan Wagner <waja@cyconet.org>
-##
-## DP: Update script to version 1.3.3 
-
-diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_storage.pl nagios-snmp-plugins-1.1.1/check_snmp_storage.pl
---- nagios-snmp-plugins-1.1.1.orig/check_snmp_storage.pl	2007-03-12 22:01:36.000000000 +0100
-+++ nagios-snmp-plugins-1.1.1/check_snmp_storage.pl	2007-10-12 22:23:24.000000000 +0200
+diff -Nur nagios_plugins/check_snmp_storage.pl plugins/check_snmp_storage.pl
+--- nagios_plugins/check_snmp_storage.pl	2007-03-12 22:01:36.000000000 +0100
++++ plugins/check_snmp_storage.pl	2007-10-20 13:26:06.000000000 +0200
 @@ -1,12 +1,12 @@
  #!/usr/bin/perl -w
  ############################## check_snmp_storage ##############
@@ -972,13 +1346,177 @@ diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_storage.pl nagios-snmp-plugi
  
  if (!defined ($output)) { $output="All selected storages "; }
  
-## 06_check_snmp_win by Jan Wagner <waja@cyconet.org>
-##
-## DP: Update script to version 1.1 
-
-diff -Nur nagios-snmp-plugins-1.1.1.orig/check_snmp_win.pl nagios-snmp-plugins-1.1.1/check_snmp_win.pl
---- nagios-snmp-plugins-1.1.1.orig/check_snmp_win.pl	2006-11-29 20:59:55.000000000 +0100
-+++ nagios-snmp-plugins-1.1.1/check_snmp_win.pl	2007-10-12 22:23:25.000000000 +0200
+diff -Nur nagios_plugins/check_snmp_vrrp.pl plugins/check_snmp_vrrp.pl
+--- nagios_plugins/check_snmp_vrrp.pl	2006-08-23 23:39:48.000000000 +0200
++++ plugins/check_snmp_vrrp.pl	2007-10-20 13:26:06.000000000 +0200
+@@ -1,11 +1,11 @@
+ #!/usr/bin/perl -w 
+ ############################## check_snmp_vrrp ##############
+-# Version : 1.3
+-# Date : Aug 23 2006
++my $Version='1.4';
++# Date : Oct 17 2007
+ # Author  : Patrick Proy (patrick at proy.org)
+-# Help : http://www.manubulon.com/nagios/
++# Help : http://nagios.manubulon.com/
+ # Licence : GPL - http://www.fsf.org/licenses/gpl.txt
+-# Contrib : C. Maser (Alteon + Netscreen) 
++# Contrib : C. Maser (Alteon + Netscreen),  Harm-Jan Blok (Foundry)
+ #################################################################
+ #
+ # Help : ./check_snmp_vrrp.pl -h
+@@ -17,10 +17,8 @@
+ 
+ # Nagios specific
+ 
+-use lib "/usr/local/nagios/libexec";
+-use utils qw(%ERRORS $TIMEOUT);
+-#my $TIMEOUT = 15;
+-#my %ERRORS=('OK'=>0,'WARNING'=>1,'CRITICAL'=>2,'UNKNOWN'=>3,'DEPENDENT'=>4);
++my $TIMEOUT = 15;
++my %ERRORS=('OK'=>0,'WARNING'=>1,'CRITICAL'=>2,'UNKNOWN'=>3,'DEPENDENT'=>4);
+ 
+ # SNMP Datas
+ 
+@@ -59,32 +57,43 @@
+ my $ns_vrrp_admin = "";
+ my $ns_vrrp_prio = "1.3.6.1.4.1.3224.6.2.2.1.4";
+ 
++######## Foundry
++my $foundry_base_vrrp = "1.3.6.1.4.1.1991.1.2.12.3.1.1";   # oid for vrrp
++my $foundry_vrrp_oper = "1.3.6.1.4.1.1991.1.2.12.3.1.1.10";   # vrrp operational status
++my $foundry_vrrp_admin ="1.3.6.1.4.1.1991.1.2.12.3.1.1.3";   # vrrp admin status
++my $foundry_vrrp_prio = "1.3.6.1.4.1.1991.1.2.12.3.1.1.6";   # vrrp vrid priority
++
++
+ ######### Make an array
+ my %base_vrrp = ("nokia",$nokia_base_vrrp,
+ 		"lp",$lp_base_vrrp,
+ 		"alteon",$alteon_base_vrrp,
+-		"nsc",$ns_base_vrrp
++		"nsc",$ns_base_vrrp,
++		"foundry",$foundry_base_vrrp
+ 		);
+ my %vrrp_oper = ("nokia",$nokia_vrrp_oper,
+ 		"lp",$lp_vrrp_oper,
+ 		"alteon",$alteon_vrrp_oper,
+-		"nsc",$ns_vrrp_oper
++		"nsc",$ns_vrrp_oper,
++		"foundry",$foundry_vrrp_oper
+ 		);
+ my %vrrp_admin =("nokia",$nokia_vrrp_admin,
+ 		"lp",$lp_vrrp_admin,
+ 		"alteon",$alteon_vrrp_admin,
+-		"nsc",$ns_vrrp_admin
++		"nsc",$ns_vrrp_admin,
++		"foundry",$foundry_vrrp_admin
+ 		);
+ my %vrrp_prio = ("nokia",$nokia_vrrp_prio,
+ 		"lp",$lp_vrrp_prio,
+ 		"alteon",$alteon_vrrp_prio,
+-		"nsc",$ns_vrrp_prio);
+-my %state_master=("nokia",3,"alteon",2,"lp",3,"nsc",2);
+-my %state_backup=("nokia",2,"alteon",3,"lp",2,"nsc",3);
++		"nsc",$ns_vrrp_prio,
++		"foundry",$foundry_vrrp_oper
++		);
+ 
+-# Globals
++my %state_master=("nokia",3,"alteon",2,"lp",3,"nsc",2,"foundry",1);
++my %state_backup=("nokia",2,"alteon",3,"lp",2,"nsc",3,"foundry",2);
+ 
+-my $Version='1.3';
++# Globals
+ 
+ my $o_host = 	undef; 		# hostname
+ my $o_community = undef; 	# community
+@@ -96,7 +105,7 @@
+ my $o_state=	undef;		# Check master or backup state for ok
+ my $o_clustnum=	undef; 		# number of cluster members
+ my $o_clustprct=	undef;	# Max % assigned to one cluster.
+-my $o_type=	'nokia';	# Check type : nokia|alteon|lp|nsc
++my $o_type=	'nokia';	# Check type : nokia|alteon|lp|nsc|foundry
+ my $o_long=		undef;		# Make output long
+ my $o_timeout=  5;              # Default 5s Timeout
+ 
+@@ -113,7 +122,7 @@
+ sub p_version { print "check_snmp_vrrp version : $Version\n"; }
+ 
+ sub print_usage {
+-    print "Usage: $0 [-v] -H <host> -C <snmp_community> [-2] | (-l login -x passwd [-X pass -L <authp>,<privp>]) -s <master|backup|num,%> [-T <nokia|alteon|lp|nsc|ipsocluster>] [-p <port>] [-t <timeout>] [-V]\n";
++    print "Usage: $0 [-v] -H <host> -C <snmp_community> [-2] | (-l login -x passwd [-X pass -L <authp>,<privp>]) -s <master|backup|num,%> [-T <nokia|alteon|lp|nsc|ipsocluster|foundry>] [-p <port>] [-t <timeout>] [-V]\n";
+ }
+ 
+ sub isnnum { # Return true if arg is not a number
+@@ -124,11 +133,11 @@
+ 
+ sub help {
+    print "\nSNMP VRRP Monitor for Nagios version ",$Version,"\n";
+-   print "(c)2004-2006 to my cat Ratoune - Author : Patrick Proy\n\n";
++   print "GPL licence, (c)2004-2007 Patrick Proy\n\n";
+    print_usage();
+    print <<EOT;
+ -v, --verbose
+-   print extra debugging information (including interface list on the system)
++   print extra debugging information
+ -h, --help
+    print this help message
+ -H, --hostname=HOST
+@@ -149,11 +158,12 @@
+    SNMP port (Default 161)
+ -T, --type=<nokia|alteon|lp|nsc|ipso>
+    Type of vrrp router to check
+-   nokia (default) : Nokai vrrp. Should be working for most vrrp routers
++   nokia (default) : Nokia vrrp. Should be working for most vrrp routers
+    alteon : for Alteon AD4 Loadbalancers
+    lp : Radware Linkproof
+    nsc : Nescreen (ScreenOS 5.x NSRP)
+    ipso : Nokia IPSO clustering
++   foundry : Foundry VRRP
+ -s, --state=master|backup|num,%
+    Nokia ipso clustering : number of members, max % assigned to nodes.
+    Other : check vrrp interface to be master or backup
+@@ -226,7 +236,7 @@
+  	  { print "state must be master or backup\n"; print_usage(); exit $ERRORS{"UNKNOWN"}}
+     }
+ 	# Check type
+-     if ( !defined($o_type) || (($o_type ne "nokia") && ($o_type ne "alteon") && ($o_type ne "lp") && ($o_type ne"nsc") && ($o_type ne"ipso")) ) 
++     if ( !defined($o_type) || (($o_type ne "nokia") && ($o_type ne "alteon") && ($o_type ne "lp") && ($o_type ne"nsc") && ($o_type ne"ipso") && ($o_type ne "foundry")) ) 
+   	{ print "type must be alteon,nokia,lp,nsc or ipso\n"; print_usage(); exit $ERRORS{"UNKNOWN"}}
+ 
+ }
+@@ -257,6 +267,7 @@
+       -username		=> $o_login,
+       -authpassword	=> $o_passwd,
+       -authprotocol	=> $o_authproto,
++	  -port             => $o_port,
+       -timeout          => $o_timeout
+     );  
+   } else {
+@@ -269,6 +280,7 @@
+       -authprotocol	=> $o_authproto,
+       -privpassword	=> $o_privpass,
+ 	  -privprotocol => $o_privproto,
++	  -port             => $o_port,
+       -timeout          => $o_timeout
+     );
+   }
+@@ -429,7 +441,11 @@
+      $key= $vrrp_admin{$o_type} . "." . $vrid[$i];
+      $value = ($$resultat{$key} == 1) ? "up" : "down";
+      $output.= $value . "/";
+-     ($value eq "up" ) && $ok++;
++     if (($o_type eq 'foundry')  && ($o_state eq 'backup') && ($value eq "down")) {
++        $ok++
++     } else {
++       ($value eq "up") && $ok++;
++     }
+    }
+    # Get the priority
+    $key=$vrrp_prio{$o_type}.".".$vrid[$i];
+diff -Nur nagios_plugins/check_snmp_win.pl plugins/check_snmp_win.pl
+--- nagios_plugins/check_snmp_win.pl	2006-11-29 20:59:55.000000000 +0100
++++ plugins/check_snmp_win.pl	2007-10-20 13:26:06.000000000 +0200
 @@ -1,10 +1,11 @@
  #!/usr/bin/perl -w
  ############################## check_snmp_win ##############
