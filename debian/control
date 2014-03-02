@@ -14,3 +14,10 @@ Architecture: all
 Depends: ${perl:Depends}, ${misc:Depends}, libnet-snmp-perl, nagios-plugins-basic (>= 1.4.5-2), perl-base (>= 5.8.4-8), ucf
 Description: SNMP Plugins for nagios
  A set of Nagios plugins to check hosts/devices using snmp protocol
+ .
+ The general idea of these scripts is to check as many things as possible with
+ snmp (how do you install NRPE on Cisco or AS/400 ?) : disks, memory, load,
+ interface, running procsses, etc...
+ .
+ The other idea is to select disks, interfaces, process using regular
+ expressions
