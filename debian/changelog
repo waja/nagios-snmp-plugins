@@ -1,3 +1,35 @@
+nagios-snmp-plugins (1.1.1-9) unstable; urgency=low
+
+  * [976e307] Update Vcs-headers
+  * [950a63f] Use full binary path instead of $ macro in command definitions
+  * [3acf202] check_snmp_storage: Add 64bit support
+  * [73c21a0] Convert the package to source format 3.0 (quilt)
+  * [6adaea0] Fix 15_check_snmp_storage_64bit
+  * [074ed96] Add travis-ci config
+  * [36857aa] travis-ci: Reorder and comment .travis.yml
+  * [9ac5f8c] update git ignore regex
+  * [f82ac54] travis-ci: Add lintian checks after build
+  * [1ea9877] Add build-indep and build-arch target into debian/rules
+  * [36735a8] Update to recent copyright format
+  * [8a119de] Updating standards version to 3.9.5, no changes needed
+  * [aaa7106] Set set -e in the body in body of the maintainers scripts
+  * [d03e055] Extend the extended package description
+  * [2fcaf9a] Fix potential privacy breach of HTML documentation
+  * [1ae942a] Add upstream changelog into package
+  * [ab802e4] Merge latest CVS patches into one
+  * [34070bf] Add missing latest CVS patches
+  * [76a78cb] Refresh patchtes
+  * [6fa6c28] Update patch description 10_fix_net_snmp_version
+  * [0193501] Rename patch 11_fix_privacy_doc into 51_fix_privacy_doc
+  * [c7fb3c5] Update patch descriptions
+  * [4623399] Add 16_perfdata to enable perfdate
+  * [93834c1] Add 17_protocol_fam to support protocol and IP familiy
+  * [8ca89ae] Add NEWS file for changed behavior of specifying port
+  * [f05ed7f] Add 18_check_snmp_process_tmp_file
+  * [e3e176d] travis-ci: Install recent lintian version
+
+ -- Jan Wagner <waja@cyconet.org>  Wed, 05 Mar 2014 22:34:26 +0100
+
 nagios-snmp-plugins (1.1.1-8) unstable; urgency=low
 
   * Add 10_fix_net_snmp_version.dpatch
