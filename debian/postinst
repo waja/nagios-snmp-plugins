@@ -5,7 +5,11 @@ set -e
 templdir=/usr/share/nagios-snmp-plugins/pluginconfig
 
 if [ "$1" = "configure" ]; then
-	if [ -f /usr/share/nagios-plugins/dpkg/functions ]; then
+	if [ -f /usr/share/monitoring-plugins/dpkg/functions ]; then
+		# only working with monitoring-plugins-basic
+		. /usr/share/monitoring-plugins/dpkg/functions
+		register_cfgs $2
+	elif [ -f /usr/share/nagios-plugins/dpkg/functions ]; then
 		# only working with nagios-plugins-basic (>= 1.4.5-2)
 		. /usr/share/nagios-plugins/dpkg/functions
 		register_cfgs $2
