@@ -12,6 +12,7 @@ Standards-Version: 3.9.5
 Package: nagios-snmp-plugins
 Architecture: all
 Depends: ${perl:Depends}, ${misc:Depends}, libnet-snmp-perl, monitoring-plugins-common | nagios-plugins-basic (>= 1.4.5-2), perl-base (>= 5.8.4-8), ucf
+Recommends: libcrypt-des-perl, libcrypt-rijndael-perl
 Description: SNMP Plugins for nagios
  A set of Nagios plugins to check hosts/devices using snmp protocol
  .
