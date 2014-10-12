@@ -1,3 +1,13 @@
+nagios-snmp-plugins (1.1.1-10) unstable; urgency=medium
+
+  * [5dbb905] Add support for monitoring-plugins
+  * [f529116] Add 'libcrypt-des-perl, libcrypt-rijndael-perl' as recommends,
+    needed for snmp v3
+  * [ce65e19] Don't use symlinked license in debian/copyright
+  * [20f7a79] Bump Standards-Version to 3.9.6, no changes needed
+
+ -- Jan Wagner <waja@cyconet.org>  Sun, 12 Oct 2014 22:23:51 +0200
+
 nagios-snmp-plugins (1.1.1-9) unstable; urgency=low
 
   * [976e307] Update Vcs-headers
