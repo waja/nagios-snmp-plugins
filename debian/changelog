@@ -1,3 +1,9 @@
+nagios-snmp-plugins (1.1.1-11) UNRELEASED; urgency=medium
+
+  * 
+
+ -- Jan Wagner <waja@cyconet.org>  Mon, 13 Oct 2014 14:56:54 +0200
+
 nagios-snmp-plugins (1.1.1-10) unstable; urgency=medium
 
   * [5dbb905] Add support for monitoring-plugins
