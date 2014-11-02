@@ -1,3 +1,9 @@
+nagios-snmp-plugins (1.1.1-12) UNRELEASED; urgency=medium
+
+  * 
+
+ -- Jan Wagner <waja@cyconet.org>  Sun, 02 Nov 2014 21:12:28 +0100
+
 nagios-snmp-plugins (1.1.1-11) unstable; urgency=medium
 
   * [dd7632d] Create /etc/nagios-plugins/config/ (Closes: #767681)
