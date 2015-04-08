@@ -2,9 +2,8 @@
 ##
 ## DP: Update to the latest know CVS verions
 
-diff -Nur nagios_plugins/Changelog plugins/Changelog
---- nagios_plugins/Changelog	2007-04-23 15:15:40.000000000 +0200
-+++ plugins/Changelog	2007-10-20 13:26:06.000000000 +0200
+--- a/Changelog
++++ b/Changelog
 @@ -1,4 +1,38 @@
  ################################
 +Release 1.1.2 / Jun 2007 : 
@@ -44,9 +43,8 @@ diff -Nur nagios_plugins/Changelog plugins/Changelog
  Release 1.1.1 / April 2007 : 
  
  Added documentation in doc/ directory : (html format).
-diff -Nur nagios_plugins/INSTALL plugins/INSTALL
---- nagios_plugins/INSTALL	1970-01-01 01:00:00.000000000 +0100
-+++ plugins/INSTALL	2007-10-20 13:26:06.000000000 +0200
+--- /dev/null
++++ b/INSTALL
 @@ -0,0 +1,15 @@
 +Installation:
 +-------------
@@ -63,9 +61,8 @@ diff -Nur nagios_plugins/INSTALL plugins/INSTALL
 +The script will check for dependencies and ask for Nagios and temp directories.
 +It will modify the scripts depending on these answers and install the scripts. 
 +
-diff -Nur nagios_plugins/README plugins/README
---- nagios_plugins/README	2007-04-20 17:04:08.000000000 +0200
-+++ plugins/README	2007-10-20 13:26:06.000000000 +0200
+--- a/README
++++ b/README
 @@ -1,4 +1,4 @@
 -Nagios SNMP plugins 1.1.1 README
 +Nagios SNMP plugins 1.1.2 README
@@ -81,9 +78,8 @@ diff -Nur nagios_plugins/README plugins/README
  
      This program is free software; you can redistribute it and/or modify 
      it under the terms of the GNU General Public License version 2 as 
-diff -Nur nagios_plugins/check_snmp_cpfw.pl plugins/check_snmp_cpfw.pl
---- nagios_plugins/check_snmp_cpfw.pl	2007-04-20 00:03:30.000000000 +0200
-+++ plugins/check_snmp_cpfw.pl	2007-10-20 13:26:06.000000000 +0200
+--- a/check_snmp_cpfw.pl
++++ b/check_snmp_cpfw.pl
 @@ -1,10 +1,11 @@
  #!/usr/bin/perl -w 
  ############################## check_snmp_cpfw ##############
@@ -245,9 +241,8 @@ diff -Nur nagios_plugins/check_snmp_cpfw.pl plugins/check_snmp_cpfw.pl
  }
  
  print "$f_print\n";
-diff -Nur nagios_plugins/check_snmp_env.pl plugins/check_snmp_env.pl
---- nagios_plugins/check_snmp_env.pl	2007-04-20 11:45:22.000000000 +0200
-+++ plugins/check_snmp_env.pl	2007-10-20 13:26:06.000000000 +0200
+--- a/check_snmp_env.pl
++++ b/check_snmp_env.pl
 @@ -1,7 +1,7 @@
  #!/usr/bin/perl -w 
  ############################## check_snmp_env #################
@@ -372,9 +367,8 @@ diff -Nur nagios_plugins/check_snmp_env.pl plugins/check_snmp_env.pl
 +
 +print "Unknown check type : UNKNOWN\n";
 +exit $ERRORS{"UNKNOWN"};
-diff -Nur nagios_plugins/check_snmp_int.pl plugins/check_snmp_int.pl
---- nagios_plugins/check_snmp_int.pl	2007-04-23 11:40:39.000000000 +0200
-+++ plugins/check_snmp_int.pl	2007-10-20 13:26:06.000000000 +0200
+--- a/check_snmp_int.pl
++++ b/check_snmp_int.pl
 @@ -1,13 +1,12 @@
  #!/usr/bin/perl -w
  ############################## check_snmp_int ##############
@@ -739,9 +733,8 @@ diff -Nur nagios_plugins/check_snmp_int.pl plugins/check_snmp_int.pl
  	}
    } 
  }
-diff -Nur nagios_plugins/check_snmp_load.pl plugins/check_snmp_load.pl
---- nagios_plugins/check_snmp_load.pl	2007-04-16 19:41:20.000000000 +0200
-+++ plugins/check_snmp_load.pl	2007-10-20 13:26:06.000000000 +0200
+--- a/check_snmp_load.pl
++++ b/check_snmp_load.pl
 @@ -1,11 +1,10 @@
  #!/usr/bin/perl -w 
  ############################## check_snmp_load #################
@@ -778,9 +771,8 @@ diff -Nur nagios_plugins/check_snmp_load.pl plugins/check_snmp_load.pl
  
  my $o_host = 	undef; 		# hostname
  my $o_community = undef; 	# community
-diff -Nur nagios_plugins/check_snmp_mem.pl plugins/check_snmp_mem.pl
---- nagios_plugins/check_snmp_mem.pl	2006-07-09 22:52:37.000000000 +0200
-+++ plugins/check_snmp_mem.pl	2007-10-20 13:26:06.000000000 +0200
+--- a/check_snmp_mem.pl
++++ b/check_snmp_mem.pl
 @@ -1,11 +1,11 @@
  #!/usr/bin/perl -w 
  ############################## check_snmp_mem ##############
@@ -929,9 +921,8 @@ diff -Nur nagios_plugins/check_snmp_mem.pl plugins/check_snmp_mem.pl
    verb ("Swap : $$resultat{$nets_swap_free} / $$resultat{$nets_swap_total} : $swapused");
    
    my $n_status="OK";
-diff -Nur nagios_plugins/check_snmp_process.pl plugins/check_snmp_process.pl
---- nagios_plugins/check_snmp_process.pl	2007-03-12 21:36:02.000000000 +0100
-+++ plugins/check_snmp_process.pl	2007-10-20 13:26:06.000000000 +0200
+--- a/check_snmp_process.pl
++++ b/check_snmp_process.pl
 @@ -1,45 +1,43 @@
  #!/usr/bin/perl -w
  ############################## check_snmp_process ##############
@@ -1132,9 +1123,8 @@ diff -Nur nagios_plugins/check_snmp_process.pl plugins/check_snmp_process.pl
  
  if ($final_status==2) { exit $ERRORS{"CRITICAL"};}
  if ($final_status==1) { exit $ERRORS{"WARNING"};}
-diff -Nur nagios_plugins/check_snmp_storage.pl plugins/check_snmp_storage.pl
---- nagios_plugins/check_snmp_storage.pl	2007-03-12 22:01:36.000000000 +0100
-+++ plugins/check_snmp_storage.pl	2007-10-20 13:26:06.000000000 +0200
+--- a/check_snmp_storage.pl
++++ b/check_snmp_storage.pl
 @@ -1,12 +1,12 @@
  #!/usr/bin/perl -w
  ############################## check_snmp_storage ##############
@@ -1350,9 +1340,8 @@ diff -Nur nagios_plugins/check_snmp_storage.pl plugins/check_snmp_storage.pl
  
  if (!defined ($output)) { $output="All selected storages "; }
  
-diff -Nur nagios_plugins/check_snmp_vrrp.pl plugins/check_snmp_vrrp.pl
---- nagios_plugins/check_snmp_vrrp.pl	2006-08-23 23:39:48.000000000 +0200
-+++ plugins/check_snmp_vrrp.pl	2007-10-20 13:26:06.000000000 +0200
+--- a/check_snmp_vrrp.pl
++++ b/check_snmp_vrrp.pl
 @@ -1,11 +1,11 @@
  #!/usr/bin/perl -w 
  ############################## check_snmp_vrrp ##############
@@ -1518,9 +1507,8 @@ diff -Nur nagios_plugins/check_snmp_vrrp.pl plugins/check_snmp_vrrp.pl
     }
     # Get the priority
     $key=$vrrp_prio{$o_type}.".".$vrid[$i];
-diff -Nur nagios_plugins/check_snmp_win.pl plugins/check_snmp_win.pl
---- nagios_plugins/check_snmp_win.pl	2006-11-29 20:59:55.000000000 +0100
-+++ plugins/check_snmp_win.pl	2007-10-20 13:26:06.000000000 +0200
+--- a/check_snmp_win.pl
++++ b/check_snmp_win.pl
 @@ -1,10 +1,11 @@
  #!/usr/bin/perl -w
  ############################## check_snmp_win ##############

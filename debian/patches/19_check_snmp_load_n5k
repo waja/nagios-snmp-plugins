@@ -9,13 +9,13 @@
 
     Adding CPU Check for Cisco Nexus Devices
 ---
- plugins/check_snmp_load.pl | 50 ++++++++++++++++++++++++++++++++++++++++++++--
+ check_snmp_load.pl | 50 ++++++++++++++++++++++++++++++++++++++++++++--
  1 file changed, 48 insertions(+), 2 deletions(-)
 
-diff --git a/plugins/check_snmp_load.pl b/plugins/check_snmp_load.pl
+diff --git a/check_snmp_load.pl b/check_snmp_load.pl
 index 6487bde..fd13f71 100755
---- a/plugins/check_snmp_load.pl
-+++ b/plugins/check_snmp_load.pl
+--- a/check_snmp_load.pl
++++ b/check_snmp_load.pl
 @@ -55,6 +55,9 @@
  
  my $as400_cpu = "1.3.6.1.4.1.2.6.4.5.1.0"; # AS400 CPU load (10000=100%);
