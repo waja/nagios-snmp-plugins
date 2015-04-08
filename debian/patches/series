@@ -4,5 +4,6 @@
 16_perfdata
 17_protocol_fam
 18_check_snmp_process_tmp_file
+19_check_snmp_load_n5k
 50_disable_epn
 51_fix_privacy_doc
