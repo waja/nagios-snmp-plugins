@@ -13,13 +13,13 @@
 
 fixes #6
 ---
- plugins/check_snmp_load.pl | 19 ++++++++++++++++++-
+check_snmp_load.pl | 19 ++++++++++++++++++-
  1 file changed, 18 insertions(+), 1 deletion(-)
 
-diff --git a/plugins/check_snmp_load.pl b/plugins/check_snmp_load.pl
+diff --git a/check_snmp_load.pl b/check_snmp_load.pl
 index fd13f71..1f29ac5 100755
---- a/plugins/check_snmp_load.pl
-+++ b/plugins/check_snmp_load.pl
+--- a/check_snmp_load.pl
++++ b/check_snmp_load.pl
 @@ -363,6 +363,20 @@ sub check_options {
  if ($o_check_type eq "netsl") {
  
