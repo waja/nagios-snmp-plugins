@@ -16,11 +16,9 @@ fixes #6
 check_snmp_load.pl | 19 ++++++++++++++++++-
  1 file changed, 18 insertions(+), 1 deletion(-)
 
-diff --git a/check_snmp_load.pl b/check_snmp_load.pl
-index fd13f71..1f29ac5 100755
 --- a/check_snmp_load.pl
 +++ b/check_snmp_load.pl
-@@ -363,6 +363,20 @@ sub check_options {
+@@ -363,11 +363,25 @@
  if ($o_check_type eq "netsl") {
  
  verb("Checking linux load");
@@ -39,9 +37,17 @@ index fd13f71..1f29ac5 100755
 +my $ncpu = keys %$resultat;
 +
  # Get load table
- my $resultat = (Net::SNMP->VERSION lt 4) ? 
+-my $resultat = (Net::SNMP->VERSION lt 4) ? 
++$resultat = (Net::SNMP->VERSION lt 4) ?
  		  $session->get_table($linload_table)
-@@ -397,10 +411,13 @@ sub check_options {
+-		: $session->get_table(Baseoid => $linload_table); 
+-		
++		: $session->get_table(Baseoid => $linload_table);
++
+ if (!defined($resultat)) {
+    printf("ERROR: Description table : %s.\n", $session->error);
+    $session->close;
+@@ -397,10 +411,13 @@
  
  for (my $i=0;$i<3;$i++) { $load[$i] = $$resultat{$linload_load . "." . $iload[$i]}};
  
