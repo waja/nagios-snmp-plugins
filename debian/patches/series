@@ -7,5 +7,6 @@
 19_check_snmp_load_n5k
 20_check_snmp_load_multiple_cpus
 21_check_snmp_load_abstract_snmp_version_check
+22_remove_utils_pm
 50_disable_epn
 51_fix_privacy_doc
