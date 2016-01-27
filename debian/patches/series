@@ -9,5 +9,6 @@
 21_check_snmp_load_abstract_snmp_version_check
 22_remove_utils_pm
 23_check_snmp_load_drop_debugging
+24_check_snmp_int_use_ifname
 50_disable_epn
 51_fix_privacy_doc
