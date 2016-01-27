@@ -1,8 +1,29 @@
-nagios-snmp-plugins (1.1.1-12) UNRELEASED; urgency=medium
+nagios-snmp-plugins (1.1.1-12) sid; urgency=medium
 
-  * 
+  * [24809b6] travis-ci: don't install build-deps manual
+  * [07c8662] travis-ci: build package with dpkg-buildpackage
+  * [82261f2] travis-ci: Initial support for uploading releases to github
+  * [94da9a0] Merging upstream changes of github-release.sh
+  * [76f4f9b] Updating copyright and author of debian/bin/github-release.sh
+  * [9157b9d] Add n5k support to check_snmp_load via
+    19_check_snmp_load_n5k patch
+  * [f4871c4] Refreshing patches/01_update_pre_1.1.2
+  * [4a57e8b] Refreshing patches/51_fix_privacy_doc
+  * [e4c5a52] Adding 20_check_snmp_load_multiple_cpus
+  * [434d3d0] Fixing pathes in 20_check_snmp_load_multiple_cpus
+  * [a31b428] Fixing 20_check_snmp_load_multiple_cpus
+  * [672a475] debian/control: reformating with warp-and-sort
+  * [bcecc23] travis-ci: grab actual used upstream version
+  * [a8f8669] Adding patchtes/21_check_snmp_load_abstract_snmp_version_check
+  * [f4e3f51] Adding patches/22_remove_utils_pm
+  * [8dd4f10] Adding patches/23_check_snmp_load_drop_debugging
+  * [96dcc51] travis-ci: Adding required arguments for trusty
+  * [6cbfcfa] travis-ci: automatically install dependencies
+  * [c5e9ec0] check_snmp_int: Add patches/24_check_snmp_int_use_ifname
+    (Closes: #812837)
+  * [d8d6d1b] d/rules: Use dh_prep instead of 'dh_clean -k'
 
- -- Jan Wagner <waja@cyconet.org>  Sun, 02 Nov 2014 21:12:28 +0100
+ -- Jan Wagner <waja@cyconet.org>  Wed, 27 Jan 2016 16:23:36 +0100
 
 nagios-snmp-plugins (1.1.1-11) unstable; urgency=medium
 
