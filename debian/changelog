@@ -1,3 +1,9 @@
+nagios-snmp-plugins (1.1.1-13) UNRELEASED; urgency=medium
+
+  * 
+
+ -- Jan Wagner <waja@cyconet.org>  Wed, 27 Jan 2016 16:56:06 +0100
+
 nagios-snmp-plugins (1.1.1-12) unstable; urgency=medium
 
   * [24809b6] travis-ci: don't install build-deps manual
