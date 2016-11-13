@@ -7,7 +7,7 @@ Build-Depends: debhelper (>= 5)
 Homepage: http://www.manubulon.com/nagios/index_snmp.html
 Vcs-Browser: http://anonscm.debian.org/gitweb/?p=pkg-nagios/pkg-nagios-snmp-plugins.git
 Vcs-Git: git://anonscm.debian.org/pkg-nagios/pkg-nagios-snmp-plugins
-Standards-Version: 3.9.6
+Standards-Version: 3.9.8
 
 Package: nagios-snmp-plugins
 Architecture: all
