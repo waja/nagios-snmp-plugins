@@ -16,7 +16,7 @@ nagios-snmp-plugins (1.1.1-12) unstable; urgency=medium
   * [f4871c4] Refreshing patches/01_update_pre_1.1.2
   * [4a57e8b] Refreshing patches/51_fix_privacy_doc
   * [e4c5a52] Adding 20_check_snmp_load_multiple_cpus
-  * [434d3d0] Fixing pathes in 20_check_snmp_load_multiple_cpus
+  * [434d3d0] Fixing paths in 20_check_snmp_load_multiple_cpus
   * [a31b428] Fixing 20_check_snmp_load_multiple_cpus
   * [672a475] debian/control: reformating with warp-and-sort
   * [bcecc23] travis-ci: grab actual used upstream version
