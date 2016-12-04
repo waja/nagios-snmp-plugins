@@ -36,7 +36,7 @@ nagios-snmp-plugins for Debian
    About regular expressions
 
    With all these scripts, when you select an interface, a service or process name
-   etc... you use by default regular expresions :
+   etc... you use by default regular expressions :
    Note : you can disable this by using "-r"
 
    Examples : Don't forget it is perl regular expressions.
