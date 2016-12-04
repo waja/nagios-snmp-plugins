@@ -1,2 +1,3 @@
 version=3
-http://www.manubulon.com/nagios/nagios-snmp-plugins\.(.*)\.tgz debian uupdate
+opts=filenamemangle=s/.+\/v?(\d\S*)\.tar\.gz/nagios-snmp-plugins-$1\.tar\.gz/,uversionmangle=s/(\d)[_\.\-\+]?((RC|rc|pre|dev|beta|alpha)\d*)$/$1-$2/ \
+  https://github.com/dnsmichi/manubulon-snmp/releases .*/v?(\d\S*)\.tar\.gz
