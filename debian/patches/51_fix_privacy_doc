@@ -8,20 +8,18 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
 
     Fix potential privacy breach of HTML documentation
 
---- a/doc/faq.html
-+++ b/doc/faq.html
-@@ -225,7 +225,7 @@
- 	  <td>
-              <p class="SectionBody">This project is also hosted by : <br>
- 
--             <A href="http://sourceforge.net/projects/nagios-snmp/"> <IMG src="http://sourceforge.net/sflogo.php?group_id=134917&type=5" width="210" height="62" border="0" alt="SourceForge.net Logo" /></A>
-+             <A href="http://sourceforge.net/projects/nagios-snmp/">http://sourceforge.net/projects/nagios-snmp</A>
- 	  </p></td>
- 	</tr>
- 
---- a/doc/index.html
-+++ b/doc/index.html
-@@ -324,7 +324,7 @@
+--- a/plugins/doc/index.html
++++ b/plugins/doc/index.html
+@@ -83,7 +83,7 @@
+           <td><font color="#FFFFFF">-----------</font></td>
+         </tr>
+         <tr> 
+-          <td> <A href="http://sourceforge.net/projects/nagios-snmp"> <IMG src="http://sourceforge.net/sflogo.php?group_id=134917&amp;type=3" width="110" height="37" border="0" alt="SourceForge.net Logo" /></A> 
++          <td> <A href="http://sourceforge.net/projects/nagios-snmp">http://sourceforge.net/projects/nagios-snmp</A> 
+           </td>
+         </tr>
+       </table>
+@@ -417,7 +417,7 @@
            <td> 
              <hr>
              <p class="SectionBody">This project is hosted on : <br>
@@ -30,8 +28,19 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
              </p>
              <p class="SectionBody"> Nagios and the Nagios logo are registered 
                trademarks of Ethan Galstad.</p>
---- a/doc/index_commands.html
-+++ b/doc/index_commands.html
+--- a/plugins/doc/faq.html
++++ b/plugins/doc/faq.html
+@@ -236,7 +236,7 @@
+ 	  <td>
+              <p class="SectionBody">This project is also hosted by : <br>
+ 
+-             <A href="http://sourceforge.net/projects/nagios-snmp/"> <IMG src="http://sourceforge.net/sflogo.php?group_id=134917&type=5" width="210" height="62" border="0" alt="SourceForge.net Logo" /></A>
++             <A href="http://sourceforge.net/projects/nagios-snmp/">http://sourceforge.net/projects/nagios-snmp</A>
+ 	  </p></td>
+ 	</tr>
+ 
+--- a/plugins/doc/index_commands.html
++++ b/plugins/doc/index_commands.html
 @@ -109,7 +109,7 @@
  
          <tr> 
@@ -50,8 +59,8 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
  
            </p>
  
---- a/doc/snmp_cpfw.html
-+++ b/doc/snmp_cpfw.html
+--- a/plugins/doc/snmp_cpfw.html
++++ b/plugins/doc/snmp_cpfw.html
 @@ -439,7 +439,7 @@
  
              <p class="SectionBody">This project is hosted on : <br>
@@ -61,8 +70,8 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
  
              </p>
  
---- a/doc/snmp_css.html
-+++ b/doc/snmp_css.html
+--- a/plugins/doc/snmp_css.html
++++ b/plugins/doc/snmp_css.html
 @@ -353,7 +353,7 @@
  
              <p class="SectionBody">This project is hosted on : <br>
@@ -72,8 +81,8 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
  
              </p>
  
---- a/doc/snmp_env.html
-+++ b/doc/snmp_env.html
+--- a/plugins/doc/snmp_env.html
++++ b/plugins/doc/snmp_env.html
 @@ -342,7 +342,7 @@
  
              <p class="SectionBody">This project is hosted on : <br>
@@ -83,9 +92,9 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
  
              </p>
  
---- a/doc/snmp_int.html
-+++ b/doc/snmp_int.html
-@@ -660,7 +660,7 @@
+--- a/plugins/doc/snmp_int.html
++++ b/plugins/doc/snmp_int.html
+@@ -643,7 +643,7 @@
  
              <p class="SectionBody">This project is hosted on : <br>
  
@@ -94,8 +103,8 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
  
              </p>
  
---- a/doc/snmp_load.html
-+++ b/doc/snmp_load.html
+--- a/plugins/doc/snmp_load.html
++++ b/plugins/doc/snmp_load.html
 @@ -379,7 +379,7 @@
  
              <p class="SectionBody">This project is hosted on : <br>
@@ -105,8 +114,8 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
  
              </p>
  
---- a/doc/snmp_mem.html
-+++ b/doc/snmp_mem.html
+--- a/plugins/doc/snmp_mem.html
++++ b/plugins/doc/snmp_mem.html
 @@ -457,7 +457,7 @@
  
              <p class="SectionBody">This project is hosted on : <br>
@@ -116,9 +125,9 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
  
              </p>
  
---- a/doc/snmp_process.html
-+++ b/doc/snmp_process.html
-@@ -332,7 +332,7 @@
+--- a/plugins/doc/snmp_process.html
++++ b/plugins/doc/snmp_process.html
+@@ -355,7 +355,7 @@
          <tr> 
            <td> 
              <p class="SectionBody">This project is hosted on : <br>
@@ -127,9 +136,9 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
              </p>
              <p class="SectionBody"> Nagios and the Nagios logo are registered 
                trademarks of Ethan Galstad.</p>
---- a/doc/snmp_storage.html
-+++ b/doc/snmp_storage.html
-@@ -1285,7 +1285,7 @@
+--- a/plugins/doc/snmp_storage.html
++++ b/plugins/doc/snmp_storage.html
+@@ -1272,7 +1272,7 @@
  
  
  
@@ -138,8 +147,8 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
  
  
  
---- a/doc/snmp_vrrp.html
-+++ b/doc/snmp_vrrp.html
+--- a/plugins/doc/snmp_vrrp.html
++++ b/plugins/doc/snmp_vrrp.html
 @@ -324,7 +324,7 @@
  
              <p class="SectionBody">This project is hosted on : <br>
@@ -149,8 +158,8 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
  
              </p>
  
---- a/doc/snmp_windows.html
-+++ b/doc/snmp_windows.html
+--- a/plugins/doc/snmp_windows.html
++++ b/plugins/doc/snmp_windows.html
 @@ -243,7 +243,7 @@
          <tr> 
            <td> 
