@@ -30,10 +30,10 @@ install: build
 	dh_installdirs
 
 	# Add here commands to install the package into debian/nagios-snmp-plugins.
-	for PLUGINS in *.pl; \
+	for PLUGINS in plugins/*.pl; \
 	do \
 		install -D -m 0755 $$PLUGINS $(NP_DIR)$(NP_LIBEXEC)/$$PLUGINS || exit 1; \
-		sed -i "s#/usr/local/nagios/libexec#$(NP_LIBEXEC)#" $(NP_DIR)$(NP_LIBEXEC)/$$PLUGINS || exit 1; \
+		sed -i "s#/usr/local/icinga/libexec#$(NP_LIBEXEC)#" $(NP_DIR)$(NP_LIBEXEC)/$$PLUGINS || exit 1; \
 	done
 	# copying templates them into seperate "template" directories outside of
 	# /usr/share/doc for ucf to use.
@@ -47,7 +47,7 @@ install: build
 		> debian/postrm
 	# copy html documentation over
 	install -d $(NP_DIR)/usr/share/doc/nagios-snmp-plugins/html/
-	cp doc/* $(NP_DIR)/usr/share/doc/nagios-snmp-plugins/html/
+	cp plugins/doc/* $(NP_DIR)/usr/share/doc/nagios-snmp-plugins/html/
 
 # Build architecture-independent files here.
 binary-indep: build install
