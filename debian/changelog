@@ -1,6 +1,19 @@
-nagios-snmp-plugins (1.1.1-13) UNRELEASED; urgency=medium
+nagios-snmp-plugins (2.0.0-1~1.gbp80b3d1) UNRELEASED; urgency=medium
 
-  * 
+  [ Bas Couwenberg ]
+  * [caf8f93] d/control: Update Vcs-* URLs to use HTTPS, use cgit instead of
+    gitweb for Vcs-Browser URL.
+
+  [ Jan Wagner ]
+  * [1eca1c0] travis-ci: Make use of travis.d.n
+  * [9c06100] New upstream version 2.0.0
+  * [c431132] d/watch: Update for new upstream URL
+  * [74388b3] Disable patches integrated in new upstream
+  * [6f3bacd] Refresh remaining patches
+  * [692a27a] d/rules: Adjusting src paths
+  * [3590951] d/rules: Stop shipping outdated upstream changelog
+  * [ceff8a0] d/docs: Adjusting src path
+  * [80b3d1e] d/README.Debian: Spellfix
 
  -- Jan Wagner <waja@cyconet.org>  Wed, 27 Jan 2016 16:56:06 +0100
 
