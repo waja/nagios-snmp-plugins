@@ -1,4 +1,4 @@
-nagios-snmp-plugins (2.0.0-1~1.gbp80b3d1) UNRELEASED; urgency=medium
+nagios-snmp-plugins (2.0.0-1) unstable; urgency=medium
 
   [ Bas Couwenberg ]
   * [caf8f93] d/control: Update Vcs-* URLs to use HTTPS, use cgit instead of
@@ -14,8 +14,9 @@ nagios-snmp-plugins (2.0.0-1~1.gbp80b3d1) UNRELEASED; urgency=medium
   * [3590951] d/rules: Stop shipping outdated upstream changelog
   * [ceff8a0] d/docs: Adjusting src path
   * [80b3d1e] d/README.Debian: Spellfix
+  * [d014d9b] d/rules: Fix installation location
 
- -- Jan Wagner <waja@cyconet.org>  Wed, 27 Jan 2016 16:56:06 +0100
+ -- Jan Wagner <waja@cyconet.org>  Thu, 08 Dec 2016 09:49:39 +0100
 
 nagios-snmp-plugins (1.1.1-12) unstable; urgency=medium
 
