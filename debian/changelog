@@ -1,3 +1,9 @@
+nagios-snmp-plugins (2.0.0-2~1.gbpc46639) UNRELEASED; urgency=medium
+
+  * UNRELEASED
+
+ -- Jan Wagner <waja@cyconet.org>  Thu, 08 Dec 2016 10:06:54 +0100
+
 nagios-snmp-plugins (2.0.0-1) unstable; urgency=medium
 
   [ Bas Couwenberg ]
