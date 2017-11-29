@@ -10,7 +10,33 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
 
 --- a/doc/html/nagios.manubulon.com/faq.html
 +++ b/doc/html/nagios.manubulon.com/faq.html
-@@ -295,7 +295,7 @@
+@@ -92,24 +92,13 @@
+         </tr>
+ <tr>
+ <td>
+-<script type="text/javascript"><!--
+-google_ad_client = "ca-pub-1303792821309694";
+-/* nagios */
+-google_ad_slot = "5986789334";
+-google_ad_width = 120;
+-google_ad_height = 600;
+-//-->
+-</script>
+-<script type="text/javascript"
+-src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+-</script>
+ </td>
+ </tr>
+         <tr>
+           <td><font color="#FFFFFF">-----------</font></td>
+         </tr>
+         <tr>
+-          <td><A href="http://sourceforge.net/projects/nagios-snmp"> <IMG src="http://sourceforge.net/sflogo.php?group_id=134917&amp;type=3" width="110" height="37" border="0" alt="SourceForge.net Logo" /></A> </td>
++          <td><A href="http://sourceforge.net/projects/nagios-snmp">http://sourceforge.net/projects/nagios-snmp</A> </td>
+         </tr>
+       </table>
+       <!-- End Side Bar -->
+@@ -295,7 +284,7 @@
  	  <td>
               <p class="SectionBody">This project is also hosted by : <br>
  
@@ -21,7 +47,24 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
  
 --- a/doc/html/nagios.manubulon.com/index_commands.html
 +++ b/doc/html/nagios.manubulon.com/index_commands.html
-@@ -104,7 +104,7 @@
+@@ -87,24 +87,13 @@
+         </tr>
+ <tr>
+ <td>
+-<script type="text/javascript"><!--
+-google_ad_client = "ca-pub-1303792821309694";
+-/* nagios */
+-google_ad_slot = "5986789334";
+-google_ad_width = 120;
+-google_ad_height = 600;
+-//-->
+-</script>
+-<script type="text/javascript"
+-src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+-</script>
+ </td>
+ </tr>
+         <tr>
            <td><font color="#FFFFFF">-----------</font></td>
          </tr>
          <tr>
@@ -30,7 +73,7 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
          </tr>
        </table>
        <!-- End Side Bar -->
-@@ -2004,7 +2004,7 @@
+@@ -2004,7 +1993,7 @@
  
            <p class="SectionBody">This project is hosted on : <br>
  
@@ -74,7 +117,33 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
  
 --- a/doc/html/nagios.manubulon.com/snmp_int.html
 +++ b/doc/html/nagios.manubulon.com/snmp_int.html
-@@ -687,7 +687,7 @@
+@@ -116,24 +116,13 @@
+         </tr>
+ <tr>
+ <td>
+-<script type="text/javascript"><!--
+-google_ad_client = "ca-pub-1303792821309694";
+-/* nagios */
+-google_ad_slot = "5986789334";
+-google_ad_width = 120;
+-google_ad_height = 600;
+-//-->
+-</script>
+-<script type="text/javascript"
+-src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+-</script>
+ </td>
+ </tr>
+         <tr>
+           <td><font color="#FFFFFF">-----------</font></td>
+         </tr>
+         <tr>
+-          <td><A href="http://sourceforge.net/projects/nagios-snmp"> <IMG src="http://sourceforge.net/sflogo.php?group_id=134917&amp;type=3" width="110" height="37" border="0" alt="SourceForge.net Logo" /></A> </td>
++          <td><A href="http://sourceforge.net/projects/nagios-snmp">http://sourceforge.net/projects/nagios-snmp</A> </td>
+         </tr>
+       </table>
+       <!-- End Side Bar -->
+@@ -687,7 +676,7 @@
  
              <p class="SectionBody">This project is hosted on : <br>
  
@@ -118,7 +187,33 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
                trademarks of Ethan Galstad.</p>
 --- a/doc/html/nagios.manubulon.com/snmp_storage.html
 +++ b/doc/html/nagios.manubulon.com/snmp_storage.html
-@@ -1278,7 +1278,7 @@
+@@ -175,24 +175,13 @@
+         </tr>
+ <tr>
+ <td>
+-<script type="text/javascript"><!--
+-google_ad_client = "ca-pub-1303792821309694";
+-/* nagios */
+-google_ad_slot = "5986789334";
+-google_ad_width = 120;
+-google_ad_height = 600;
+-//-->
+-</script>
+-<script type="text/javascript"
+-src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+-</script>
+ </td>
+ </tr>
+         <tr>
+           <td><font color="#FFFFFF">-----------</font></td>
+         </tr>
+         <tr>
+-          <td><A href="http://sourceforge.net/projects/nagios-snmp"> <IMG src="http://sourceforge.net/sflogo.php?group_id=134917&amp;type=3" width="110" height="37" border="0" alt="SourceForge.net Logo" /></A> </td>
++          <td><A href="http://sourceforge.net/projects/nagios-snmp">http://sourceforge.net/projects/nagios-snmp</A> </td>
+         </tr>
+       </table>
+       <!-- End Side Bar -->
+@@ -1278,7 +1267,7 @@
  
  
  
@@ -129,7 +224,33 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
  
 --- a/doc/html/nagios.manubulon.com/snmp_vrrp.html
 +++ b/doc/html/nagios.manubulon.com/snmp_vrrp.html
-@@ -348,7 +348,7 @@
+@@ -94,24 +94,13 @@
+         </tr>
+ <tr>
+ <td>
+-<script type="text/javascript"><!--
+-google_ad_client = "ca-pub-1303792821309694";
+-/* nagios */
+-google_ad_slot = "5986789334";
+-google_ad_width = 120;
+-google_ad_height = 600;
+-//-->
+-</script>
+-<script type="text/javascript"
+-src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+-</script>
+ </td>
+ </tr>
+         <tr>
+           <td><font color="#FFFFFF">-----------</font></td>
+         </tr>
+         <tr>
+-          <td><A href="http://sourceforge.net/projects/nagios-snmp"> <IMG src="http://sourceforge.net/sflogo.php?group_id=134917&amp;type=3" width="110" height="37" border="0" alt="SourceForge.net Logo" /></A> </td>
++          <td><A href="http://sourceforge.net/projects/nagios-snmp">http://sourceforge.net/projects/nagios-snmp</A> </td>
+         </tr>
+       </table>
+       <!-- End Side Bar -->
+@@ -348,7 +337,7 @@
  
              <p class="SectionBody">This project is hosted on : <br>
  
@@ -149,3 +270,125 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
              </p>
              <p class="SectionBody"> Nagios and the Nagios logo are registered 
                trademarks of Ethan Galstad.</p>
+--- a/doc/html/nagios.manubulon.com/index.html
++++ b/doc/html/nagios.manubulon.com/index.html
+@@ -88,24 +88,13 @@
+         </tr>
+ <tr>
+ <td>
+-<script type="text/javascript"><!--
+-google_ad_client = "ca-pub-1303792821309694";
+-/* nagios */
+-google_ad_slot = "5986789334";
+-google_ad_width = 120;
+-google_ad_height = 600;
+-//-->
+-</script>
+-<script type="text/javascript"
+-src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+-</script>
+ </td>
+ </tr>
+         <tr>
+           <td><font color="#FFFFFF">-----------</font></td>
+         </tr>
+         <tr>
+-          <td><A href="http://sourceforge.net/projects/nagios-snmp"> <IMG src="http://sourceforge.net/sflogo.php?group_id=134917&amp;type=3" width="110" height="37" border="0" alt="SourceForge.net Logo" /></A> </td>
++          <td><A href="http://sourceforge.net/projects/nagios-snmp">http://sourceforge.net/projects/nagios-snmp</A> </td>
+         </tr>
+       </table>
+       <!-- End Side Bar -->
+@@ -339,7 +328,7 @@
+         <tr>
+           <td><p class="SectionBody">All code here is under GPL licence. </p>
+             <p class="SectionBody">This project is hosted on : <br>
+-              <A href="http://sourceforge.net/projects/nagios-snmp"> <IMG src="http://sourceforge.net/sflogo.php?group_id=134917&type=5" width="210" height="62" border="0" alt="SourceForge.net Logo" /></A> </p></td>
++              <A href="http://sourceforge.net/projects/nagios-snmp">http://sourceforge.net/projects/nagios-snmp</p></td>
+           <td><p class="SectionBody"> Nagios and the Nagios logo are registered 
+               trademarks of Ethan Galstad.</p></td>
+         </tr>
+--- a/doc/html/nagios.manubulon.com/index_info.html
++++ b/doc/html/nagios.manubulon.com/index_info.html
+@@ -86,24 +86,13 @@
+         </tr>
+ <tr>
+ <td>
+-<script type="text/javascript"><!--
+-google_ad_client = "ca-pub-1303792821309694";
+-/* nagios */
+-google_ad_slot = "5986789334";
+-google_ad_width = 120;
+-google_ad_height = 600;
+-//-->
+-</script>
+-<script type="text/javascript"
+-src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+-</script>
+ </td>
+ </tr>
+         <tr>
+           <td><font color="#FFFFFF">-----------</font></td>
+         </tr>
+         <tr>
+-          <td><A href="http://sourceforge.net/projects/nagios-snmp"> <IMG src="http://sourceforge.net/sflogo.php?group_id=134917&amp;type=3" width="110" height="37" border="0" alt="SourceForge.net Logo" /></A> </td>
++          <td><A href="http://sourceforge.net/projects/nagios-snmp">http://sourceforge.net/projects/nagios-snmp</A> </td>
+         </tr>
+       </table>
+       <!-- End Side Bar -->
+@@ -588,7 +577,7 @@
+           <td> 
+             <hr>
+             <p class="SectionBody">This project is hosted on : <br>
+-              <A href="http://sourceforge.net/projects/nagios-snmp"> <IMG src="http://sourceforge.net/sflogo.php?group_id=134917&type=5" width="210" height="62" border="0" alt="SourceForge.net Logo" /></A> 
++              <A href="http://sourceforge.net/projects/nagios-snmp">http://sourceforge.net/projects/nagios-snmp</A> 
+             </p>
+             <p class="SectionBody"> Nagios and the Nagios logo are registered 
+               trademarks of Ethan Galstad.</p>
+--- a/doc/html/nagios.manubulon.com/index_snmp.html
++++ b/doc/html/nagios.manubulon.com/index_snmp.html
+@@ -86,24 +86,13 @@
+         </tr>
+ <tr>
+ <td>
+-<script type="text/javascript"><!--
+-google_ad_client = "ca-pub-1303792821309694";
+-/* nagios */
+-google_ad_slot = "5986789334";
+-google_ad_width = 120;
+-google_ad_height = 600;
+-//-->
+-</script>
+-<script type="text/javascript"
+-src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+-</script>
+ </td>
+ </tr>
+         <tr>
+           <td><font color="#FFFFFF">-----------</font></td>
+         </tr>
+         <tr>
+-          <td><A href="http://sourceforge.net/projects/nagios-snmp"> <IMG src="http://sourceforge.net/sflogo.php?group_id=134917&amp;type=3" width="110" height="37" border="0" alt="SourceForge.net Logo" /></A> </td>
++          <td><A href="http://sourceforge.net/projects/nagios-snmp">http://sourceforge.net/projects/nagios-snmp</A> </td>
+         </tr>
+       </table>
+       <!-- End Side Bar -->
+@@ -437,7 +426,7 @@
+           <td> 
+             <hr>
+             <p class="SectionBody">This project is hosted on : <br>
+-              <A href="http://sourceforge.net/projects/nagios-snmp"> <IMG src="http://sourceforge.net/sflogo.php?group_id=134917&type=5" width="210" height="62" border="0" alt="SourceForge.net Logo" /></A> 
++              <A href="http://sourceforge.net/projects/nagios-snmp">http://sourceforge.net/projects/nagios-snmp</A> 
+             </p>
+             <p class="SectionBody"> Nagios and the Nagios logo are registered 
+               trademarks of Ethan Galstad.</p>
+--- a/doc/html/nagios.manubulon.com/package_c.html
++++ b/doc/html/nagios.manubulon.com/package_c.html
+@@ -162,7 +162,7 @@
+ 
+             <p class="SectionBody">This project is hosted on : <br>
+ 
+-              <A href="http://sourceforge.net/projects/nagios-snmp"> <IMG src="http://sourceforge.net/sflogo.php?group_id=134917&type=5" width="210" height="62" border="0" alt="SourceForge.net Logo" /></A> 
++              <A href="http://sourceforge.net/projects/nagios-snmp">http://sourceforge.net/projects/nagios-snmp</A> 
+ 
+             </p>
+ 
