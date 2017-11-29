@@ -16,7 +16,7 @@
  #!/usr/bin/perl -w 
 +# nagios: -epn
  ############################## check_snmp_cpfw ##############
- my $VERSION = "2.0.0";
+ my $VERSION = "2.1.0";
  
 --- a/plugins/check_snmp_css_main.pl
 +++ b/plugins/check_snmp_css_main.pl
@@ -48,7 +48,7 @@
  #!/usr/bin/perl -w
 +# nagios: -epn
  ############################## check_snmp_int ##############
- my $VERSION = "2.0.0";
+ my $VERSION = "2.1.0";
  
 --- a/plugins/check_snmp_linkproof_nhr.pl
 +++ b/plugins/check_snmp_linkproof_nhr.pl
@@ -64,7 +64,7 @@
  #!/usr/bin/perl -w 
 +# nagios: -epn
  ############################## check_snmp_load #################
- my $VERSION = "2.0.0";
+ my $VERSION = "2.1.0";
  
 --- a/plugins/check_snmp_mem.pl
 +++ b/plugins/check_snmp_mem.pl
@@ -72,7 +72,7 @@
  #!/usr/bin/perl -w 
 +# nagios: -epn
  ############################## check_snmp_mem ##############
- my $VERSION = "2.0.0";
+ my $VERSION = "2.1.0";
  
 --- a/plugins/check_snmp_nsbox.pl
 +++ b/plugins/check_snmp_nsbox.pl
@@ -88,7 +88,7 @@
  #!/usr/bin/perl -w
 +# nagios: -epn
  ############################## check_snmp_process ##############
- my $VERSION = "2.0.0";
+ my $VERSION = "2.1.0";
  
 --- a/plugins/check_snmp_storage.pl
 +++ b/plugins/check_snmp_storage.pl
@@ -104,7 +104,7 @@
  #!/usr/bin/perl -w 
 +# nagios: -epn
  ############################## check_snmp_vrrp ##############
- my $VERSION = "2.0.0";
+ my $VERSION = "2.1.0";
  
 --- a/plugins/check_snmp_win.pl
 +++ b/plugins/check_snmp_win.pl
@@ -112,5 +112,5 @@
  #!/usr/bin/perl -w
 +# nagios: -epn
  ############################## check_snmp_win ##############
- my $VERSION = "2.0.0";
+ my $VERSION = "2.1.0";
  

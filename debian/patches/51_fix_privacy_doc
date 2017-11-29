@@ -8,29 +8,9 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
 
     Fix potential privacy breach of HTML documentation
 
---- a/plugins/doc/index.html
-+++ b/plugins/doc/index.html
-@@ -83,7 +83,7 @@
-           <td><font color="#FFFFFF">-----------</font></td>
-         </tr>
-         <tr> 
--          <td> <A href="http://sourceforge.net/projects/nagios-snmp"> <IMG src="http://sourceforge.net/sflogo.php?group_id=134917&amp;type=3" width="110" height="37" border="0" alt="SourceForge.net Logo" /></A> 
-+          <td> <A href="http://sourceforge.net/projects/nagios-snmp">http://sourceforge.net/projects/nagios-snmp</A> 
-           </td>
-         </tr>
-       </table>
-@@ -417,7 +417,7 @@
-           <td> 
-             <hr>
-             <p class="SectionBody">This project is hosted on : <br>
--              <A href="http://sourceforge.net/projects/nagios-snmp"> <IMG src="http://sourceforge.net/sflogo.php?group_id=134917&type=5" width="210" height="62" border="0" alt="SourceForge.net Logo" /></A> 
-+              <A href="http://sourceforge.net/projects/nagios-snmp">http://sourceforge.net/projects/nagios-snmp</A> 
-             </p>
-             <p class="SectionBody"> Nagios and the Nagios logo are registered 
-               trademarks of Ethan Galstad.</p>
---- a/plugins/doc/faq.html
-+++ b/plugins/doc/faq.html
-@@ -236,7 +236,7 @@
+--- a/doc/html/nagios.manubulon.com/faq.html
++++ b/doc/html/nagios.manubulon.com/faq.html
+@@ -295,7 +295,7 @@
  	  <td>
               <p class="SectionBody">This project is also hosted by : <br>
  
@@ -39,18 +19,18 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
  	  </p></td>
  	</tr>
  
---- a/plugins/doc/index_commands.html
-+++ b/plugins/doc/index_commands.html
-@@ -109,7 +109,7 @@
- 
-         <tr> 
- 
--          <td> <A href="http://sourceforge.net/projects/nagios-snmp"> <IMG src="http://sourceforge.net/sflogo.php?group_id=134917&amp;type=3" width="110" height="37" border="0" alt="SourceForge.net Logo" /></A> 
-+          <td> <A href="http://sourceforge.net/projects/nagios-snmp">http://sourceforge.net/projects/nagios-snmp</A> 
- 
-           </td>
- 
-@@ -2014,7 +2014,7 @@
+--- a/doc/html/nagios.manubulon.com/index_commands.html
++++ b/doc/html/nagios.manubulon.com/index_commands.html
+@@ -104,7 +104,7 @@
+           <td><font color="#FFFFFF">-----------</font></td>
+         </tr>
+         <tr>
+-          <td><A href="http://sourceforge.net/projects/nagios-snmp"> <IMG src="http://sourceforge.net/sflogo.php?group_id=134917&amp;type=3" width="110" height="37" border="0" alt="SourceForge.net Logo" /></A> </td>
++          <td><A href="http://sourceforge.net/projects/nagios-snmp">http://sourceforge.net/projects/nagios-snmp</A> </td>
+         </tr>
+       </table>
+       <!-- End Side Bar -->
+@@ -2004,7 +2004,7 @@
  
            <p class="SectionBody">This project is hosted on : <br>
  
@@ -59,8 +39,8 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
  
            </p>
  
---- a/plugins/doc/snmp_cpfw.html
-+++ b/plugins/doc/snmp_cpfw.html
+--- a/doc/html/nagios.manubulon.com/snmp_cpfw.html
++++ b/doc/html/nagios.manubulon.com/snmp_cpfw.html
 @@ -439,7 +439,7 @@
  
              <p class="SectionBody">This project is hosted on : <br>
@@ -70,8 +50,8 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
  
              </p>
  
---- a/plugins/doc/snmp_css.html
-+++ b/plugins/doc/snmp_css.html
+--- a/doc/html/nagios.manubulon.com/snmp_css.html
++++ b/doc/html/nagios.manubulon.com/snmp_css.html
 @@ -353,7 +353,7 @@
  
              <p class="SectionBody">This project is hosted on : <br>
@@ -81,8 +61,8 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
  
              </p>
  
---- a/plugins/doc/snmp_env.html
-+++ b/plugins/doc/snmp_env.html
+--- a/doc/html/nagios.manubulon.com/snmp_env.html
++++ b/doc/html/nagios.manubulon.com/snmp_env.html
 @@ -342,7 +342,7 @@
  
              <p class="SectionBody">This project is hosted on : <br>
@@ -92,9 +72,9 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
  
              </p>
  
---- a/plugins/doc/snmp_int.html
-+++ b/plugins/doc/snmp_int.html
-@@ -643,7 +643,7 @@
+--- a/doc/html/nagios.manubulon.com/snmp_int.html
++++ b/doc/html/nagios.manubulon.com/snmp_int.html
+@@ -687,7 +687,7 @@
  
              <p class="SectionBody">This project is hosted on : <br>
  
@@ -103,8 +83,8 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
  
              </p>
  
---- a/plugins/doc/snmp_load.html
-+++ b/plugins/doc/snmp_load.html
+--- a/doc/html/nagios.manubulon.com/snmp_load.html
++++ b/doc/html/nagios.manubulon.com/snmp_load.html
 @@ -379,7 +379,7 @@
  
              <p class="SectionBody">This project is hosted on : <br>
@@ -114,8 +94,8 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
  
              </p>
  
---- a/plugins/doc/snmp_mem.html
-+++ b/plugins/doc/snmp_mem.html
+--- a/doc/html/nagios.manubulon.com/snmp_mem.html
++++ b/doc/html/nagios.manubulon.com/snmp_mem.html
 @@ -457,7 +457,7 @@
  
              <p class="SectionBody">This project is hosted on : <br>
@@ -125,8 +105,8 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
  
              </p>
  
---- a/plugins/doc/snmp_process.html
-+++ b/plugins/doc/snmp_process.html
+--- a/doc/html/nagios.manubulon.com/snmp_process.html
++++ b/doc/html/nagios.manubulon.com/snmp_process.html
 @@ -355,7 +355,7 @@
          <tr> 
            <td> 
@@ -136,9 +116,9 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
              </p>
              <p class="SectionBody"> Nagios and the Nagios logo are registered 
                trademarks of Ethan Galstad.</p>
---- a/plugins/doc/snmp_storage.html
-+++ b/plugins/doc/snmp_storage.html
-@@ -1272,7 +1272,7 @@
+--- a/doc/html/nagios.manubulon.com/snmp_storage.html
++++ b/doc/html/nagios.manubulon.com/snmp_storage.html
+@@ -1278,7 +1278,7 @@
  
  
  
@@ -147,9 +127,9 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
  
  
  
---- a/plugins/doc/snmp_vrrp.html
-+++ b/plugins/doc/snmp_vrrp.html
-@@ -324,7 +324,7 @@
+--- a/doc/html/nagios.manubulon.com/snmp_vrrp.html
++++ b/doc/html/nagios.manubulon.com/snmp_vrrp.html
+@@ -348,7 +348,7 @@
  
              <p class="SectionBody">This project is hosted on : <br>
  
@@ -158,8 +138,8 @@ Date:   Sun Mar 2 21:22:42 2014 +0100
  
              </p>
  
---- a/plugins/doc/snmp_windows.html
-+++ b/plugins/doc/snmp_windows.html
+--- a/doc/html/nagios.manubulon.com/snmp_windows.html
++++ b/doc/html/nagios.manubulon.com/snmp_windows.html
 @@ -243,7 +243,7 @@
          <tr> 
            <td> 
