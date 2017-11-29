@@ -1,8 +1,9 @@
-nagios-snmp-plugins (2.0.0-2~1.gbpc46639) UNRELEASED; urgency=medium
+nagios-snmp-plugins (2.1.0-1~1.gbp0ced9d) UNRELEASED; urgency=medium
 
   * UNRELEASED
+  * [75687e0] New upstream version 2.1.0
 
- -- Jan Wagner <waja@cyconet.org>  Thu, 08 Dec 2016 10:06:54 +0100
+ -- Jan Wagner <waja@cyconet.org>  Wed, 29 Nov 2017 16:30:09 +0100
 
 nagios-snmp-plugins (2.0.0-1) unstable; urgency=medium
 
