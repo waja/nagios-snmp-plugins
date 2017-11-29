@@ -29,7 +29,7 @@ my $lp_port  = "1.3.6.1.4.1.89.35.1.38.1.1.15";    # nhr users
 
 # Globals
 
-my $VERSION = "2.0.0";
+my $VERSION = "2.1.0";
 
 my $o_host      = undef;                           # hostname
 my $o_community = undef;                           # community
@@ -210,6 +210,7 @@ if (defined($o_login) && defined($o_passwd)) {
         verb("SNMPv3 AuthNoPriv login : $o_login, $o_authproto");
         ($session, $error) = Net::SNMP->session(
             -hostname     => $o_host,
+            -port         => $o_port,
             -version      => '3',
             -username     => $o_login,
             -authpassword => $o_passwd,
@@ -220,6 +221,7 @@ if (defined($o_login) && defined($o_passwd)) {
         verb("SNMPv3 AuthPriv login : $o_login, $o_authproto, $o_privproto");
         ($session, $error) = Net::SNMP->session(
             -hostname     => $o_host,
+            -port         => $o_port,
             -version      => '3',
             -username     => $o_login,
             -authpassword => $o_passwd,

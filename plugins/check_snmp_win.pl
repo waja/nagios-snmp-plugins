@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 ############################## check_snmp_win ##############
-my $VERSION = "2.0.0";
+my $VERSION = "2.1.0";
 
 # Date : Oct 12 2007
 # Author  : Patrick Proy (patrick at proy.org)
@@ -247,6 +247,7 @@ if (defined($o_login) && defined($o_passwd)) {
     verb("SNMPv3 login");
     ($session, $error) = Net::SNMP->session(
         -hostname     => $o_host,
+        -port         => $o_port,
         -version      => '3',
         -username     => $o_login,
         -authpassword => $o_passwd,
