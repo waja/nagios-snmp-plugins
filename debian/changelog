@@ -2,6 +2,7 @@ nagios-snmp-plugins (2.1.0-1~1.gbp0ced9d) UNRELEASED; urgency=medium
 
   * UNRELEASED
   * [75687e0] New upstream version 2.1.0
+  * Bump Standards-Version to 4.1.5, no changes.
 
  -- Jan Wagner <waja@cyconet.org>  Wed, 29 Nov 2017 16:30:09 +0100
 
