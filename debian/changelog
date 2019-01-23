@@ -1,10 +1,32 @@
-nagios-snmp-plugins (2.1.0-1~1.gbp0ced9d) UNRELEASED; urgency=medium
+nagios-snmp-plugins (2.1.0-1) unstable; urgency=medium
 
-  * UNRELEASED
+  [ Jan Wagner ]
   * [75687e0] New upstream version 2.1.0
-  * Bump Standards-Version to 4.3.0, no changes.
+  * [181c319] Refresh patches
+  * [568042e] d/rules: Adjust new documentation source path
+  * [ea34bcb] d/patches/51_fix_privacy_doc: Remove more potential privacy
+    breach
+  * [117e400] d/control: Bump Standards-Version to 4.1.1, no changes needed
+  * [f2e8ac9] d/docs: Fix location of the README
+  * [c0535e4] Adding .travis-ci.yml
+  * [019d443] d/control: Update VCS-headers
 
- -- Jan Wagner <waja@cyconet.org>  Wed, 29 Nov 2017 16:30:09 +0100
+  [ Bas Couwenberg ]
+  * [c07faf2] Bump Standards-Version to 4.1.5, no changes.
+  * [53cdb54] Bump Standards-Version to 4.2.0, no changes.
+  * [70b7138] Bump Standards-Version to 4.2.1, no changes.
+  * [3d095b1] Bump Standards-Version to 4.3.0, no changes.
+
+  [ Jan Wagner ]
+  * [cb66729] Delete old unused patches
+  * [bcc13b4] Adding d/p/10_check_snmp_storage_error_handling
+  * [af07b7c] Adding d/p/11_check_snmp_int_agent_workaround
+  * [890a780] Adding d/p/12_check_snmp_mem_perf
+  * [f45e77a] Adding d/p/13_check_snmp_process_new_features
+  * [cb17d7e] d/control: Updating Homepage-field to
+    https://github.com/dnsmichi/manubulon-snmp
+
+ -- Jan Wagner <waja@cyconet.org>  Wed, 23 Jan 2019 20:44:01 +0100
 
 nagios-snmp-plugins (2.0.0-1) unstable; urgency=medium
 
