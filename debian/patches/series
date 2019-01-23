@@ -1,5 +1,6 @@
 10_check_snmp_storage_error_handling
 11_check_snmp_int_agent_workaround
 12_check_snmp_mem_perf
+13_check_snmp_process_new_features
 50_disable_epn
 51_fix_privacy_doc
