@@ -9,6 +9,7 @@ nagios-snmp-plugins (2.1.0-2) UNRELEASED; urgency=medium
     lines.
   * Bump debhelper from deprecated 5 to 12.
   * Set debhelper-compat version in Build-Depends.
+  * Update standards version to 4.5.0, no changes needed.
 
  -- Jan Wagner <waja@cyconet.org>  Wed, 23 Jan 2019 22:34:43 +0100
 
