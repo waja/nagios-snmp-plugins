@@ -6,5 +6,6 @@
 15_check_snmp_int_spaces
 16_check_snmp_win_max_message_size
 17_check_snmp_storage_okifempty
+18_check_snmp_int_fix_perf_out
 50_disable_epn
 51_fix_privacy_doc
