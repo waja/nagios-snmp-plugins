@@ -4,5 +4,6 @@
 13_check_snmp_process_new_features
 14_check_snmp_int_ign
 15_check_snmp_int_spaces
+16_check_snmp_win_max_message_size
 50_disable_epn
 51_fix_privacy_doc
