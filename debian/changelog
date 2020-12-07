@@ -1,17 +1,41 @@
-nagios-snmp-plugins (2.1.0-2) UNRELEASED; urgency=medium
-
-  [ Jan Wagner ]
-  *
+nagios-snmp-plugins (2.1.0-2) unstable; urgency=medium
 
   [ Debian Janitor ]
   * Use secure copyright file specification URI.
   * debian/copyright: use spaces rather than tabs to start continuation
     lines.
-  * Bump debhelper from deprecated 5 to 12.
+  * Bump debhelper from deprecated 5 to 12. (Closes: #965745)
   * Set debhelper-compat version in Build-Depends.
   * Update standards version to 4.5.0, no changes needed.
 
- -- Jan Wagner <waja@cyconet.org>  Wed, 23 Jan 2019 22:34:43 +0100
+  [ Jan Wagner ]
+  * [a75e780] Removing .travis.yml and adding .gitlab-ci.yml
+
+  [ Bas Couwenberg ]
+  * [e989ff9] Bump watch file version to 4.
+  * [b345ea5] Bump Standards-Version to 4.5.1, no changes.
+
+  [ Jan Wagner ]
+  * [a815051] check_snmp_int.pl: added ign-admindown, ign-emptyalias options.
+    fixed unitialized variable warning by adding d/p/14_check_snmp_int_ign
+    from upstream
+  * [c1ffe3e] check_snmp_int.pl: Add spaces only if necessary by adding
+    d/p/15_check_snmp_int_spaces from upstream
+  * [ef233ba] check_snmp_win.pl: Add -o option (max message size) by adding
+    d/p/16_check_snmp_win_max_message_size from upstream
+  * [085ba7e] check_snmp_storage.pl: add support for allowing considering OK if
+    no storage found matching given criteria by adding
+    d/p/17_check_snmp_storage_okifempty from upstream
+  * [84561d3] check_snmp_int.pl: fix perf_out not defined error by adding
+    d/p/18_check_snmp_int_fix_perf_out
+  * [45b2b11] d/control: Updating upstream to
+    https://github.com/SteScho/manubulon-snmp
+  * [f9bf220] d/watch: Updating upstream to
+    https://github.com/SteScho/manubulon-snmp
+  * [8f6cd11] Refreshing patches
+  * [c1f1d25] d/copyright: Removing tabs
+
+ -- Jan Wagner <waja@cyconet.org>  Mon, 07 Dec 2020 15:50:39 +0100
 
 nagios-snmp-plugins (2.1.0-1) unstable; urgency=medium
 
