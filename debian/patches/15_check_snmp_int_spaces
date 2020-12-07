@@ -7,11 +7,9 @@ Subject: [PATCH] Add spaces only if necessary, resolving bug #32
  plugins/check_snmp_int.pl | 7 +++++--
  1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/plugins/check_snmp_int.pl b/plugins/check_snmp_int.pl
-index e938131..6e42163 100755
 --- a/plugins/check_snmp_int.pl
 +++ b/plugins/check_snmp_int.pl
-@@ -718,7 +718,7 @@ sub check_options {
+@@ -777,7 +777,7 @@
  # make all checks and output for all interfaces
  for (my $i = 0; $i < $num_int; $i++) {
      $print_out .= ", " if (defined($print_out));
@@ -20,9 +18,9 @@ index e938131..6e42163 100755
      my $usable_data = 1;
  
      # Get the status of the current interface
-@@ -726,7 +726,10 @@ sub check_options {
+@@ -785,7 +785,10 @@
          = defined($o_admin)
-         ? $$result{ $admin_table . $tindex[$i] }
+         ? $$result{ $admin_table . "." . $tindex[$i] }
          : $$result{ $oper_table . $tindex[$i] };
 -
 +    
