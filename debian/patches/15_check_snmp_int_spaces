@@ -1,0 +1,34 @@
+From 8f1c304b82c7bd9f5d1b23faa91ba86b0f99c4e2 Mon Sep 17 00:00:00 2001
+From: PGranado <pgranado@pt.lu>
+Date: Fri, 22 Mar 2019 15:05:32 +0100
+Subject: [PATCH] Add spaces only if necessary, resolving bug #32
+
+---
+ plugins/check_snmp_int.pl | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/plugins/check_snmp_int.pl b/plugins/check_snmp_int.pl
+index e938131..6e42163 100755
+--- a/plugins/check_snmp_int.pl
++++ b/plugins/check_snmp_int.pl
+@@ -718,7 +718,7 @@ sub check_options {
+ # make all checks and output for all interfaces
+ for (my $i = 0; $i < $num_int; $i++) {
+     $print_out .= ", " if (defined($print_out));
+-    $perf_out  .= " "  if (defined($perf_out));
++    
+     my $usable_data = 1;
+ 
+     # Get the status of the current interface
+@@ -726,7 +726,10 @@ sub check_options {
+         = defined($o_admin)
+         ? $$result{ $admin_table . $tindex[$i] }
+         : $$result{ $oper_table . $tindex[$i] };
+-
++    
++    # Add spaces only if necessary
++    $perf_out .= " " if (defined ($perf_out) && $int_status==2 ) ;
++    
+     # Make the bandwith & error checks if necessary
+     if (defined($o_checkperf) && $int_status == 1) {
+         $temp_file_name = $descr[$i];

@@ -3,5 +3,6 @@
 12_check_snmp_mem_perf
 13_check_snmp_process_new_features
 14_check_snmp_int_ign
+15_check_snmp_int_spaces
 50_disable_epn
 51_fix_privacy_doc
