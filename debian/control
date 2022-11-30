@@ -14,7 +14,6 @@ Package: nagios-snmp-plugins
 Architecture: all
 Depends: libnet-snmp-perl,
          monitoring-plugins-common | nagios-plugins-basic (>= 1.4.5-2),
-         perl-base (>= 5.8.4-8),
          ucf,
          ${misc:Depends},
          ${perl:Depends}
