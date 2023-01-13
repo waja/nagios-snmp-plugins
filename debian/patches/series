@@ -9,5 +9,6 @@
 18_check_snmp_int_fix_perf_out
 19_check_snmp_int_remove_unneeded_my
 20_check_snmp_int_avaid_huge_amount_of_regex
+21_check_snmp_load_update_fortiswitch_and_fortigate4.3
 50_disable_epn
 51_fix_privacy_doc
