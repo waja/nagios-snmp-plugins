@@ -1,8 +1,41 @@
-nagios-snmp-plugins (2.1.0-3) UNRELEASED; urgency=medium
+nagios-snmp-plugins (2.1.0-3) unstable; urgency=medium
 
+  [ Jan Wagner ]
   * NOT RELEASED YET
+  * [4ffef41] Adding Github CI
+  * [071a540] Set upstream metadata fields: Bug-Database, Bug-Submit,
+    Repository, Repository-Browse.
+  * [56b1ad4] d/source/options: Adding .github to diff ignore
+  * [731359e] d/source/options: Fixing github ignore
 
- -- Jan Wagner <waja@cyconet.org>  Mon, 07 Dec 2020 17:03:12 +0100
+  [ Bas Couwenberg ]
+  * [9f8c997] Bump Standards-Version to 4.6.0, no changes.
+  * [547ca5d] Update watch file to use tags instead of releases.
+  * [0fef6a8] Bump Standards-Version to 4.6.1, no changes.
+
+
+  [ Bas Couwenberg ]
+  * [36ad122] Add Rules-Requires-Root to control file.
+
+  [ Jan Wagner ]
+  * [465be3f] d/control: Drop 'pkg-' from Vcs-Headers
+
+  [ Debian Janitor ]
+  * [8bb1998] Remove constraints unnecessary since buster (oldstable)
+  * [16004b9] Remove constraints unnecessary since buster (oldstable)
+
+  [ Jan Wagner ]
+  * [ea50f54] Bump debhelper from old 12 to 13.
+  * [4f38dec] Update standards version to 4.6.2, no changes needed.
+  * [a193b79] Adding d/p/19_check_snmp_int_remove_unneeded_my from upstream
+  * [fdc0108] Adding d/p/20_check_snmp_int_avaid_huge_amount_of_regex from
+    upstream
+  * [d4bd9c9] Adding d/p/21_check_snmp_load_update_fortiswitch_and_fortigate4.3
+    from upstream
+  * [e2bdf2d] Adding d/p/22_check_snmp_storage_fix_space_btrfs from upstream
+    (Closes: #959956)
+
+ -- Jan Wagner <waja@cyconet.org>  Mon, 23 Jan 2023 13:45:41 +0000
 
 nagios-snmp-plugins (2.1.0-2) unstable; urgency=medium
 
@@ -23,7 +56,7 @@ nagios-snmp-plugins (2.1.0-2) unstable; urgency=medium
 
   [ Jan Wagner ]
   * [a815051] check_snmp_int.pl: added ign-admindown, ign-emptyalias options.
-    fixed unitialized variable warning by adding d/p/14_check_snmp_int_ign
+    fixed uninitialized variable warning by adding d/p/14_check_snmp_int_ign
     from upstream
   * [c1ffe3e] check_snmp_int.pl: Add spaces only if necessary by adding
     d/p/15_check_snmp_int_spaces from upstream
