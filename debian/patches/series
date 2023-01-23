@@ -10,5 +10,6 @@
 19_check_snmp_int_remove_unneeded_my
 20_check_snmp_int_avaid_huge_amount_of_regex
 21_check_snmp_load_update_fortiswitch_and_fortigate4.3
+22_check_snmp_storage_fix_space_btrfs
 50_disable_epn
 51_fix_privacy_doc

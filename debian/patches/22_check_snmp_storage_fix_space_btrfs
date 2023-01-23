@@ -1,0 +1,423 @@
+From 42f4ebf23be504e448513a67faa99e02a3d5e3b5 Mon Sep 17 00:00:00 2001
+From: IB Development Team <dev@ib.pl>
+Date: Thu, 19 Jan 2023 10:36:45 +0000
+Subject: [PATCH] No out of space check_snmp_storage warning on btrfs
+
+We've noticed out of space condition in one of btrfs filesystems
+monitored with check_snmp_storage; problem was not detected by
+check_snmp_storage.
+
+Filesystem status:
+
+root@mysrv:~# btrfs fi df -b /mnt
+Data, single: total=2222194688, used=2222194688
+System, DUP: total=8388608, used=16384
+System, single: total=4194304, used=0
+Metadata, DUP: total=484835328, used=163921920
+Metadata, single: total=8388608, used=0
+GlobalReserve, single: total=16777216, used=0
+
+root@mysrv:~# df -B1 /mnt
+Filesystem       1B-blocks       Used     Available Use% Mounted on
+/dev/mapper/myvg 3221225472   2566848512         0  100% /mnt
+
+Net-snmp snmp infos for this fs:
+
+hrStorageTable (used by check_snmp_storage):
+
+iso.3.6.1.2.1.25.2.3.1.1.69 = INTEGER: 69                  //
+hrStorageIndex
+iso.3.6.1.2.1.25.2.3.1.2.69 = OID: iso.3.6.1.2.1.25.2.1.4  //
+hrStorageType
+iso.3.6.1.2.1.25.2.3.1.3.69 = STRING: "/mnt"               //
+hrStorageDescr
+iso.3.6.1.2.1.25.2.3.1.4.69 = INTEGER: 4096                //
+hrStorageAllocationUnits
+iso.3.6.1.2.1.25.2.3.1.5.69 = INTEGER: 786432              //
+hrStorageSize
+iso.3.6.1.2.1.25.2.3.1.6.69 = INTEGER: 626672              //
+hrStorageUsed
+
+dskTable (not used by check_snmp_storage):
+
+iso.3.6.1.4.1.2021.9.1.1.19 = INTEGER:
+19                                 // dskIndex
+iso.3.6.1.4.1.2021.9.1.2.19 = STRING:
+"/mnt"                              // dskPath
+iso.3.6.1.4.1.2021.9.1.3.19 = STRING: "/dev/mapper/myvg"           //
+dskDevice
+iso.3.6.1.4.1.2021.9.1.4.19 = INTEGER:
+-1                                 // dskMinimum
+iso.3.6.1.4.1.2021.9.1.5.19 = INTEGER:
+10                                 // dskMinPercent
+iso.3.6.1.4.1.2021.9.1.6.19 = INTEGER:
+3145728                            // dskTotal (Total size of the
+disk/partion (kBytes))
+iso.3.6.1.4.1.2021.9.1.7.19 = INTEGER:
+0                                  // dskAvail (Available space on the
+disk)
+iso.3.6.1.4.1.2021.9.1.8.19 = INTEGER:
+2506688                            // dskUsed (Used space on the disk)
+iso.3.6.1.4.1.2021.9.1.9.19 = INTEGER:
+80                                 // dskPercent (Percentage of space
+used on disk)
+iso.3.6.1.4.1.2021.9.1.10.19 = INTEGER:
+0                                 // dskPercentNode (Percentage of
+inodes used on disk)
+iso.3.6.1.4.1.2021.9.1.11.19 = Gauge32:
+3145728                           // dskTotalLow Total size of the
+disk/partion (kBytes). Together with dskTotalHigh composes 64-bit
+number)
+iso.3.6.1.4.1.2021.9.1.12.19 = Gauge32:
+0                                 // dskTotalHigh (Total size of the
+disk/partion (kBytes). Together with dskTotalLow composes 64-bit
+number.)
+iso.3.6.1.4.1.2021.9.1.13.19 = Gauge32:
+0                                 // dskAvailLow (Available space on
+the disk (kBytes). Together with dskAvailHigh composes 64-bit number.)
+iso.3.6.1.4.1.2021.9.1.14.19 = Gauge32:
+0                                 // dskAvailHigh (Available space on
+the disk (kBytes). Together with dskAvailLow composes 64-bit number.)
+iso.3.6.1.4.1.2021.9.1.15.19 = Gauge32:
+2506688                           // dskUsedLow (Used space on the disk
+(kBytes). Together with dskUsedHigh composes 64-bit number.)
+iso.3.6.1.4.1.2021.9.1.16.19 = Gauge32:
+0                                 // dskUsedHigh (Used space on the
+disk (kBytes). Together with dskUsedLow composes 64-bit number.)
+iso.3.6.1.4.1.2021.9.1.100.19 = INTEGER:
+1                                // dskErrorFlag (Error flag signaling
+that the disk or partition is under the minimum required space
+configured for it.)
+iso.3.6.1.4.1.2021.9.1.101.19 = STRING: "/mnt: less than 10% free (=
+0%)" // dskErrorMsg (A text description providing a warning and the
+space left on the disk.)
+
+The cause of problem is that in btrfs free space may be less than
+total-used and by default check_snmp_storage checks used space which
+was in this case about 80% (with 0% available in the same time and OS
+was throwing OOS errors on write).
+
+The solution is to configure warn/crit levels for %free not %used and
+use avail from dskTable because hrStorageTable does not provide this
+info (check_snmp_storage calculates free=total-used which is wrong for
+btrfs as above).
+
+This patch works ok for us (this allows one to use new -u switch to use
+dskTable and its avail info instead of default hrStorageTable and its
+free=total-used calculation). This also adds a few spaces to plugin
+output for better message readability.
+---
+ plugins/check_snmp_storage.pl | 145 ++++++++++++++++++++++++++--------
+ 1 file changed, 110 insertions(+), 35 deletions(-)
+
+--- a/plugins/check_snmp_storage.pl
++++ b/plugins/check_snmp_storage.pl
+@@ -19,13 +19,21 @@
+ my %ERRORS = ('OK' => 0, 'WARNING' => 1, 'CRITICAL' => 2, 'UNKNOWN' => 3, 'DEPENDENT' => 4);
+ 
+ # SNMP Datas
+-my $storage_table     = '1.3.6.1.2.1.25.2.3.1';
+-my $storagetype_table = '1.3.6.1.2.1.25.2.3.1.2';
+-my $index_table       = '1.3.6.1.2.1.25.2.3.1.1';
+-my $descr_table       = '1.3.6.1.2.1.25.2.3.1.3';
+-my $size_table        = '1.3.6.1.2.1.25.2.3.1.5.';
+-my $used_table        = '1.3.6.1.2.1.25.2.3.1.6.';
+-my $alloc_units       = '1.3.6.1.2.1.25.2.3.1.4.';
++
++my $hrStorageTable_storage_table     = '1.3.6.1.2.1.25.2.3.1';
++my $hrStorageTable_storagetype_table = '1.3.6.1.2.1.25.2.3.1.2';
++my $hrStorageTable_index_table       = '1.3.6.1.2.1.25.2.3.1.1';
++my $hrStorageTable_descr_table       = '1.3.6.1.2.1.25.2.3.1.3';
++my $hrStorageTable_size_table        = '1.3.6.1.2.1.25.2.3.1.5.';
++my $hrStorageTable_used_table        = '1.3.6.1.2.1.25.2.3.1.6.';
++my $hrStorageTable_alloc_units       = '1.3.6.1.2.1.25.2.3.1.4.';
++
++my $dskTable_storage_table = '1.3.6.1.4.1.2021.9.1';
++my $dskTable_index_table = '1.3.6.1.4.1.2021.9.1.1';
++my $dskTable_descr_table = '1.3.6.1.4.1.2021.9.1.2';
++my $dskTable_size_table = '1.3.6.1.4.1.2021.9.1.6.';
++my $dskTable_avail_table = '1.3.6.1.4.1.2021.9.1.7.';
++my $dskTable_used_table = '1.3.6.1.4.1.2021.9.1.8.';
+ 
+ #Storage types definition  - from /usr/share/snmp/mibs/HOST-RESOURCES-TYPES.txt
+ my %hrStorage;
+@@ -80,6 +88,8 @@
+ my @o_shortL      = undef;                       # output type,where,cut
+ my $o_reserve     = 0;                           # % reserved blocks (A. Greiner-B\ufffdr patch)
+ my $o_giga        = undef;                       # output and levels in gigabytes instead of megabytes
++my $o_dsktable    = undef;                       # use dskTable instead of default hrStorageTable
++
+ 
+ # SNMPv3 specific
+ my $o_login     = undef;                         # Login for snmpv3
+@@ -99,7 +109,7 @@
+ 
+ sub print_usage {
+     print
+-"Usage: $Name [-v] -H <host> -C <snmp_community> [-2] | (-l login -x passwd [-X pass -L <authp>,<privp>]) [-p <port>] [-P <protocol>] -m <name in desc_oid> [-q storagetype] -w <warn_level> -c <crit_level> [-t <timeout>] [-T pl|pu|bl|bu ] [-r -s -i -G] [-e] [-O] [-S 0|1[,1,<car>]] [-o <octet_length>] [-R <% reserved>]\n";
++"Usage: $Name [-v] -H <host> -C <snmp_community> [-2] | (-l login -x passwd [-X pass -L <authp>,<privp>]) [-p <port>] [-P <protocol>] [-u] -m <name in desc_oid> [-q storagetype] -w <warn_level> -c <crit_level> [-t <timeout>] [-T pl|pu|bl|bu ] [-r -s -i -G] [-e] [-O] [-S 0|1[,1,<car>]] [-o <octet_length>] [-R <% reserved>]\n";
+ }
+ 
+ sub round ($$) {
+@@ -145,13 +155,13 @@
+ -2, --v2c
+    Use snmp v2c
+ -l, --login=LOGIN ; -x, --passwd=PASSWD
+-   Login and auth password for snmpv3 authentication 
+-   If no priv password exists, implies AuthNoPriv 
++   Login and auth password for snmpv3 authentication
++   If no priv password exists, implies AuthNoPriv
+ -X, --privpass=PASSWD
+    Priv password for snmpv3 (AuthPriv protocol)
+ -L, --protocols=<authproto>,<privproto>
+    <authproto> : Authentication protocol (md5|sha : default md5)
+-   <privproto> : Priv protocole (des|aes : default des) 
++   <privproto> : Priv protocole (des|aes : default des)
+ -x, --passwd=PASSWD
+    Password for snmpv3 authentication
+ -p, --port=PORT
+@@ -162,6 +172,8 @@
+     'udp/ipv6'  : UDP over IPv6
+     'tcp/ipv4'  : TCP over IPv4
+     'tcp/ipv6'  : TCP over IPv6
++-u, --dsktable
++   use dskTable instead of default hrStorageTable; cannot be used with -q
+ -m, --name=NAME
+    Name in description OID (can be mounpoints '/home' or 'Swap Space'...)
+    This is treated as a regexp : -m /var will match /var , /var/log, /opt/var ...
+@@ -190,10 +202,10 @@
+    bu : calculate MegaBytes used
+ -w, --warn=INTEGER
+    percent / MB of disk used to generate WARNING state
+-   you can add the % sign 
++   you can add the % sign
+ -c, --critical=INTEGER
+    percent / MB of disk used to generate CRITICAL state
+-   you can add the % sign 
++   you can add the % sign
+ -R, --reserved=INTEGER
+    % reserved blocks for superuser
+    For ext2/3 filesystems, it is 5% by default
+@@ -205,29 +217,29 @@
+    <type>: Make the output shorter :
+      0 : only print the global result except the disk in warning or critical
+          ex: "< 80% : OK"
+-     1 : Don't print all info for every disk 
++     1 : Don't print all info for every disk
+          ex : "/ : 66 %used  (<  80) : OK"
+    <where>: (optional) if = 1, put the OK/WARN/CRIT at the beginning
+    <cut>: take the <n> first caracters or <n> last if n<0
+ -o, --octetlength=INTEGER
+   max-size of the SNMP message, usefull in case of Too Long responses.
+   Be carefull with network filters. Range 484 - 65535, default are
+-  usually 1472,1452,1460 or 1440.   
++  usually 1472,1452,1460 or 1440.
+ -t, --timeout=INTEGER
+    timeout for SNMP in seconds (Default: 5)
+ -V, --version
+    prints version number
+-Note : 
++Note :
+   with T=pu or T=bu : OK < warn < crit
+   with T=pl ot T=bl : crit < warn < OK
+-  
++
+   If multiple storage are selected, the worse condition will be returned
+   i.e if one disk is critical, the return is critical
+- 
+-  example : 
+-  Browse storage list : <script> -C <community> -H <host> -m <anything> -w 1 -c 2 -v 
+-  the -m option allows regexp in perl format : 
+-  Test drive C,F,G,H,I on Windows 	: -m ^[CFGHI]:    
++
++  example :
++  Browse storage list : <script> -C <community> -H <host> -m <anything> -w 1 -c 2 -v
++  the -m option allows regexp in perl format :
++  Test drive C,F,G,H,I on Windows 	: -m ^[CFGHI]:
+   Test all mounts containing /var      	: -m /var
+   Test all mounts under /var      	: -m ^/var
+   Test only /var                 	: -m /var -r
+@@ -270,6 +282,8 @@
+         'warn:s'        => \$o_warn,
+         't:i'           => \$o_timeout,
+         'timeout:i'     => \$o_timeout,
++        'u'             => \$o_dsktable,
++        'dsktable64'    => \$o_dsktable,
+         'm:s'           => \$o_descr,
+         'name:s'        => \$o_descr,
+         'T:s'           => \$o_type,
+@@ -404,6 +418,14 @@
+         print_usage();
+         exit $ERRORS{"UNKNOWN"};
+     }
++
++    # disallow using -u and -q together
++    if (defined($o_dsktable) && defined($o_storagetype)) {
++        print "Parameters -u and -q cannot be used together!\n";
++        print_usage();
++        exit $ERRORS{"UNKNOWN"}
++    }
++
+ }
+ 
+ ########## MAIN #######
+@@ -507,6 +529,30 @@
+ my $resultat = undef;
+ my $stype    = undef;
+ 
++my $storage_table;
++my $index_table;
++my $descr_table;
++my $size_table;
++my $used_table;
++my $alloc_units;
++
++if (defined($o_dsktable)) {
++    $storage_table = $dskTable_storage_table;
++    $index_table = $dskTable_index_table;
++    $descr_table = $dskTable_descr_table;
++    $size_table = $dskTable_size_table;
++    $used_table = $dskTable_used_table;
++    $alloc_units = 'dummy';
++}
++else {
++    $storage_table = $hrStorageTable_storage_table;
++    $index_table = $hrStorageTable_index_table;
++    $descr_table = $hrStorageTable_descr_table;
++    $size_table = $hrStorageTable_size_table;
++    $used_table = $hrStorageTable_used_table;
++    $alloc_units = $hrStorageTable_alloc_units;
++}
++
+ # Get rid of UTF8 translation in case of accentuated caracters (thanks to Dimo Velev).
+ $session->translate(Net::SNMP->TRANSLATE_NONE);
+ if (defined($o_index)) {
+@@ -526,9 +572,9 @@
+ #get storage typetable for reference
+ if (defined($o_storagetype)) {
+     if (version->parse(Net::SNMP->VERSION) < 4) {
+-        $stype = $session->get_table($storagetype_table);
++        $stype = $session->get_table($hrStorageTable_storagetype_table);
+     } else {
+-        $stype = $session->get_table(Baseoid => $storagetype_table);
++        $stype = $session->get_table(Baseoid => $hrStorageTable_storagetype_table);
+     }
+ }
+ if (!defined($resultat) | (!defined($stype) && defined($o_storagetype))) {
+@@ -573,7 +619,7 @@
+ 
+         # Check if storage type is OK
+         if (defined($o_storagetype)) {
+-            my ($skey) = $storagetype_table . "." . $tindex[$num_int];
++            my ($skey) = $hrStorageTable_storagetype_table . "." . $tindex[$num_int];
+             verb("   OID : $skey, Storagetype: $hrStorage{$$stype{$skey}} ?= $o_storagetype");
+             if ($hrStorage{ $$stype{$skey} } !~ $o_storagetype) {
+                 $test = undef;
+@@ -587,7 +633,12 @@
+             # put the oid in an array
+             $oids[$count_oid++] = $size_table . $tindex[$num_int];
+             $oids[$count_oid++] = $used_table . $tindex[$num_int];
+-            $oids[$count_oid++] = $alloc_units . $tindex[$num_int];
++            if (!defined($o_dsktable)) {
++                $oids[$count_oid++] = $alloc_units . $tindex[$num_int];
++            }
++            else {
++                $oids[$count_oid++] = $dskTable_avail_table . $tindex[$num_int];
++            }
+ 
+             verb("   Name : $descr[$num_int], Index : $tindex[$num_int]");
+             $num_int++;
+@@ -635,9 +686,17 @@
+ # Only a few ms left...
+ alarm(0);
+ 
++# dskTable use fixed 1kB unit
++if (defined($o_dsktable)) {
++    for (my $i = 0; $i < $num_int; $i++) {
++        $$result{ $alloc_units . $tindex[$i] } = 1024;
++    }
++}
++
+ # Sum everything if -s and more than one storage
+ if (defined($o_sum) && ($num_int > 1)) {
+     verb("Adding all entries");
++
+     $$result{ $size_table . $tindex[0] } *= $$result{ $alloc_units . $tindex[0] };
+     $$result{ $used_table . $tindex[0] } *= $$result{ $alloc_units . $tindex[0] };
+     $$result{ $alloc_units . $tindex[0] } = 1;
+@@ -670,6 +729,9 @@
+     verb("Size :  $$result{$size_table . $tindex[$i]}");
+     verb("Used : $$result{$used_table . $tindex[$i]}");
+     verb("Alloc : $$result{$alloc_units . $tindex[$i]}");
++    if (defined($o_dsktable)) {
++        verb("Avail : $$result{$dskTable_avail_table . $tindex[$i]}");
++    }
+ 
+     if (   !defined($$result{ $size_table . $tindex[$i] })
+         || !defined($$result{ $used_table . $tindex[$i] })
+@@ -691,12 +753,24 @@
+         $pu = 0;
+     }
+     my $bu = $$result{ $used_table . $tindex[$i] } * $$result{ $alloc_units . $tindex[$i] } / $output_metric_val;
+-    my $pl = 100 - $pu;
+-    my $bl
+-        = (
+-        ($$result{ $size_table . $tindex[$i] } * ((100 - $o_reserve) / 100) - ($$result{ $used_table . $tindex[$i] }))
+-        * $$result{ $alloc_units . $tindex[$i] }
++
++    # in dskTable mode get available storage from SNMP to avoid problems with filesystems like btrfs
++    # where available may be 0 but size-used is still > 0
++    my $pl;
++    my $bl;
++    if (defined($o_dsktable)) {
++        $pl = $$result{ $dskTable_avail_table . $tindex[$i] } * 100
++           / ($$result{ $size_table . $tindex[$i] } * (100 - $o_reserve) / 100);
++        $bl = $$result{ $dskTable_avail_table . $tindex[$i] } * $$result{ $alloc_units . $tindex[$i] }
++            / $output_metric_val;
++    }
++    else {
++        $pl = 100 - $pu;
++        $bl = (
++            ($$result{ $size_table . $tindex[$i] } * ((100 - $o_reserve) / 100) - ($$result{ $used_table . $tindex[$i] }))
++            * $$result{ $alloc_units . $tindex[$i] }
+             / $output_metric_val);
++    }
+ 
+     # add a ' ' if some data exists in $perf_out
+     $perf_out .= " " if (defined($perf_out));
+@@ -717,7 +791,7 @@
+             || (($pu >= $o_warn) && ($locstate = $warn_state = 1));
+         if (defined($o_shortL[2])) { }
+         if (!defined($o_shortL[0]) || ($locstate == 1)) {    # print full output if warn or critical state
+-            $output .= sprintf("%s: %.0f%%used(%.0f%sB/%.0f%sB) ", $descr[$i], $pu, $bu, $output_metric, $to,
++            $output .= sprintf("%s: %.0f%% used (%.0f%sB/%.0f%sB) ", $descr[$i], $pu, $bu, $output_metric, $to,
+                 $output_metric);
+         } elsif ($o_shortL[0] == 1) {
+             $output .= sprintf("%s: %.0f%% ", $descr[$i], $pu);
+@@ -732,7 +806,7 @@
+             || (($bu >= $o_warn) && ($locstate = $warn_state = 1));
+         if (!defined($o_shortL[0]) || ($locstate == 1)) {    # print full output if warn or critical state
+             $output
+-                .= sprintf("%s: %.0f%sBused/%.0f%sB (%.0f%%) ", $descr[$i], $bu, $output_metric, $to, $output_metric,
++                .= sprintf("%s: %.0f%sB used / %.0f%sB (%.0f%%) ", $descr[$i], $bu, $output_metric, $to, $output_metric,
+                 $pu);
+         } elsif ($o_shortL[0] == 1) {
+             $output .= sprintf("%s: %.0f%sB ", $descr[$i], $bu, $output_metric);
+@@ -747,7 +821,7 @@
+             || (($bl <= $o_warn) && ($locstate = $warn_state = 1));
+         if (!defined($o_shortL[0]) || ($locstate == 1)) {    # print full output if warn or critical state
+             $output
+-                .= sprintf("%s: %.0f%sBleft/%.0f%sB (%.0f%%) ", $descr[$i], $bl, $output_metric, $to, $output_metric,
++                .= sprintf("%s: %.0f%sB left / %.0f%sB (%.0f%%) ", $descr[$i], $bl, $output_metric, $to, $output_metric,
+                 $pl);
+         } elsif ($o_shortL[0] == 1) {
+             $output .= sprintf("%s: %.0f%sB ", $descr[$i], $bl, $output_metric);
+@@ -761,7 +835,7 @@
+         (($pl <= $o_crit) && ($locstate = $crit_state = 1))
+             || (($pl <= $o_warn) && ($locstate = $warn_state = 1));
+         if (!defined($o_shortL[0]) || ($locstate == 1)) {    # print full output if warn or critical state
+-            $output .= sprintf("%s: %.0f%%left(%.0f%sB/%.0f%sB) ", $descr[$i], $pl, $bl, $output_metric, $to,
++            $output .= sprintf("%s: %.0f%% left (%.0f%sB/%.0f%sB) ", $descr[$i], $pl, $bl, $output_metric, $to,
+                 $output_metric);
+         } elsif ($o_shortL[0] == 1) {
+             $output .= sprintf("%s: %.0f%% ", $descr[$i], $pl);
