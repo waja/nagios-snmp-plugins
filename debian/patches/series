@@ -12,5 +12,6 @@
 21_check_snmp_load_update_fortiswitch_and_fortigate4.3
 22_check_snmp_storage_fix_space_btrfs
 23_check_snmp_int_interface_speed
+24_tcp_udp_ipv4_ipv6
 50_disable_epn
 51_fix_privacy_doc

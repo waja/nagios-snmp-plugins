@@ -1,0 +1,761 @@
+From 394ade3c6b5816c4cbca09750cb01622d474e508 Mon Sep 17 00:00:00 2001
+From: Patrick Grimm <patrick@lunatiki.de>
+Date: Sun, 10 Mar 2024 01:56:45 +0100
+Subject: [PATCH] add --protocol= setting tcp/udp and IPv4/IPv6 for
+ boostedge/cpfw/css/css_main/env/int/linkproof_nhr/nsbox/vrrp/win
+
+reworked the patches from
+5369da5d2b3e4351e04f016619736f7d03cbcdfd
+---
+ plugins/check_snmp_boostedge.pl     | 22 ++++++++++++++++++----
+ plugins/check_snmp_cpfw.pl          | 22 ++++++++++++++++++----
+ plugins/check_snmp_css.pl           | 22 ++++++++++++++++++----
+ plugins/check_snmp_css_main.pl      | 22 ++++++++++++++++++----
+ plugins/check_snmp_env.pl           | 22 ++++++++++++++++++----
+ plugins/check_snmp_int.pl           | 22 ++++++++++++++++++----
+ plugins/check_snmp_linkproof_nhr.pl | 22 ++++++++++++++++++----
+ plugins/check_snmp_nsbox.pl         | 22 ++++++++++++++++++----
+ plugins/check_snmp_vrrp.pl          | 22 ++++++++++++++++++----
+ plugins/check_snmp_win.pl           | 19 ++++++++++++++++---
+ 10 files changed, 178 insertions(+), 39 deletions(-)
+
+diff --git a/plugins/check_snmp_boostedge.pl b/plugins/check_snmp_boostedge.pl
+index 5eaca78..2284379 100755
+--- a/plugins/check_snmp_boostedge.pl
++++ b/plugins/check_snmp_boostedge.pl
+@@ -43,6 +43,7 @@
+ my $o_host      = undef;                                 # hostname
+ my $o_community = undef;                                 # community
+ my $o_port      = 161;                                   # port
++my $o_domain    = 'udp/ipv4';                            # protocol
+ my $o_help      = undef;                                 # wan't some help ?
+ my $o_verb      = undef;                                 # verbose mode
+ my $o_version   = undef;                                 # print version
+@@ -121,6 +122,14 @@ sub help {
+    <privproto> : Priv protocole (des|aes : default des) 
+ -P, --port=PORT
+    SNMP port (Default 161)
++--protocol=PROTOCOL
++   Network protocol to be used
++   ['udp/ipv4'] : UDP over IPv4
++    'udp/ipv6'  : UDP over IPv6
++    'tcp/ipv4'  : TCP over IPv4
++    'tcp/ipv6'  : TCP over IPv6
++
++   Network protocol (Default udp/ipv4)
+ -f, --perfparse, --perfdata
+    Performance data output
+ -t, --timeout=INTEGER
+@@ -144,6 +153,7 @@ sub check_options {
+         'hostname:s'  => \$o_host,
+         'p:i'         => \$o_port,
+         'port:i'      => \$o_port,
++        'protocol:s'  => \$o_domain,
+         'C:s'         => \$o_community,
+         'community:s' => \$o_community,
+         'l:s'         => \$o_login,
+@@ -252,7 +262,8 @@ sub check_options {
+             -username     => $o_login,
+             -authpassword => $o_passwd,
+             -authprotocol => $o_authproto,
+-            -timeout      => $o_timeout
++            -timeout      => $o_timeout,
++            -domain       => $o_domain
+         );
+     } else {
+         verb("SNMPv3 AuthPriv login : $o_login, $o_authproto, $o_privproto");
+@@ -265,7 +276,8 @@ sub check_options {
+             -authprotocol => $o_authproto,
+             -privpassword => $o_privpass,
+             -privprotocol => $o_privproto,
+-            -timeout      => $o_timeout
++            -timeout      => $o_timeout,
++            -domain       => $o_domain
+         );
+     }
+ } else {
+@@ -278,7 +290,8 @@ sub check_options {
+             -version   => 2,
+             -community => $o_community,
+             -port      => $o_port,
+-            -timeout   => $o_timeout
++            -timeout   => $o_timeout,
++            -domain    => $o_domain
+         );
+     } else {
+ 
+@@ -288,7 +301,8 @@ sub check_options {
+             -hostname  => $o_host,
+             -community => $o_community,
+             -port      => $o_port,
+-            -timeout   => $o_timeout
++            -timeout   => $o_timeout,
++            -domain    => $o_domain
+         );
+     }
+ }
+diff --git a/plugins/check_snmp_cpfw.pl b/plugins/check_snmp_cpfw.pl
+index b29c3e9..5e3f7f5 100755
+--- a/plugins/check_snmp_cpfw.pl
++++ b/plugins/check_snmp_cpfw.pl
+@@ -77,6 +77,7 @@
+ my $o_community = undef;                                 # community
+ my $o_version2  = undef;                                 # Version 2
+ my $o_port      = 161;                                   # port
++my $o_domain    = 'udp/ipv4';                            # protocol
+ my $o_help      = undef;                                 # wan't some help ?
+ my $o_verb      = undef;                                 # verbose mode
+ my $o_version   = undef;                                 # print version
+@@ -154,6 +155,14 @@ sub help {
+    performance data output (only works with -c)
+ -P, --port=PORT
+    SNMP port (Default 161)
++--protocol=PROTOCOL
++   Network protocol to be used
++   ['udp/ipv4'] : UDP over IPv4
++    'udp/ipv6'  : UDP over IPv6
++    'tcp/ipv4'  : TCP over IPv4
++    'tcp/ipv6'  : TCP over IPv6
++
++   Network protocol (Default udp/ipv4)
+ -t, --timeout=INTEGER
+    timeout for SNMP (Default: Nagios default)   
+ -V, --version
+@@ -175,6 +184,7 @@ sub check_options {
+         'hostname:s'   => \$o_host,
+         'P:i'          => \$o_port,
+         'port:i'       => \$o_port,
++        'protocol:s'   => \$o_domain,
+         'C:s'          => \$o_community,
+         'community:s'  => \$o_community,
+         '2'            => \$o_version2,
+@@ -315,7 +325,8 @@ sub check_options {
+             -port         => $o_port,
+             -authpassword => $o_passwd,
+             -authprotocol => $o_authproto,
+-            -timeout      => $o_timeout
++            -timeout      => $o_timeout,
++            -domain       => $o_domain
+         );
+     } else {
+         verb("SNMPv3 AuthPriv login : $o_login, $o_authproto, $o_privproto");
+@@ -328,7 +339,8 @@ sub check_options {
+             -authprotocol => $o_authproto,
+             -privpassword => $o_privpass,
+             -privprotocol => $o_privproto,
+-            -timeout      => $o_timeout
++            -timeout      => $o_timeout,
++            -domain       => $o_domain
+         );
+     }
+ } else {
+@@ -341,7 +353,8 @@ sub check_options {
+             -version   => 2,
+             -community => $o_community,
+             -port      => $o_port,
+-            -timeout   => $o_timeout
++            -timeout   => $o_timeout,
++            -domain    => $o_domain
+         );
+     } else {
+ 
+@@ -351,7 +364,8 @@ sub check_options {
+             -hostname  => $o_host,
+             -community => $o_community,
+             -port      => $o_port,
+-            -timeout   => $o_timeout
++            -timeout   => $o_timeout,
++            -domain    => $o_domain
+         );
+     }
+ }
+diff --git a/plugins/check_snmp_css.pl b/plugins/check_snmp_css.pl
+index 3f375b4..ab7d52f 100755
+--- a/plugins/check_snmp_css.pl
++++ b/plugins/check_snmp_css.pl
+@@ -40,6 +40,7 @@
+ my $o_host      = undef;                                    # hostname
+ my $o_community = undef;                                    # community
+ my $o_port      = 161;                                      # port
++my $o_domain    = 'udp/ipv4';                               # protocol
+ my $o_help      = undef;                                    # wan't some help ?
+ my $o_verb      = undef;                                    # verbose mode
+ my $o_version   = undef;                                    # print version
+@@ -141,6 +142,14 @@ sub help {
+    <privproto> : Priv protocole (des|aes : default des) 
+ -P, --port=PORT
+    SNMP port (Default 161)
++--protocol=PROTOCOL
++   Network protocol to be used
++   ['udp/ipv4'] : UDP over IPv4
++    'udp/ipv6'  : UDP over IPv6
++    'tcp/ipv4'  : TCP over IPv4
++    'tcp/ipv6'  : TCP over IPv6
++
++   Network protocol (Default udp/ipv4)
+ -f, --perfparse
+    Perfparse compatible output
+ -t, --timeout=INTEGER
+@@ -164,6 +173,7 @@ sub check_options {
+         'hostname:s'  => \$o_host,
+         'p:i'         => \$o_port,
+         'port:i'      => \$o_port,
++        'protocol:s'  => \$o_domain,
+         'C:s'         => \$o_community,
+         'community:s' => \$o_community,
+         'l:s'         => \$o_login,
+@@ -331,7 +341,8 @@ sub check_options {
+             -username     => $o_login,
+             -authpassword => $o_passwd,
+             -authprotocol => $o_authproto,
+-            -timeout      => $o_timeout
++            -timeout      => $o_timeout,
++            -domain       => $o_domain
+         );
+     } else {
+         verb("SNMPv3 AuthPriv login : $o_login, $o_authproto, $o_privproto");
+@@ -344,7 +355,8 @@ sub check_options {
+             -authprotocol => $o_authproto,
+             -privpassword => $o_privpass,
+             -privprotocol => $o_privproto,
+-            -timeout      => $o_timeout
++            -timeout      => $o_timeout,
++            -domain       => $o_domain
+         );
+     }
+ } else {
+@@ -357,7 +369,8 @@ sub check_options {
+             -version   => 2,
+             -community => $o_community,
+             -port      => $o_port,
+-            -timeout   => $o_timeout
++            -timeout   => $o_timeout,
++            -domain    => $o_domain
+         );
+     } else {
+ 
+@@ -367,7 +380,8 @@ sub check_options {
+             -hostname  => $o_host,
+             -community => $o_community,
+             -port      => $o_port,
+-            -timeout   => $o_timeout
++            -timeout   => $o_timeout,
++            -domain    => $o_domain
+         );
+     }
+ }
+diff --git a/plugins/check_snmp_css_main.pl b/plugins/check_snmp_css_main.pl
+index 0d52694..a74bb31 100755
+--- a/plugins/check_snmp_css_main.pl
++++ b/plugins/check_snmp_css_main.pl
+@@ -40,6 +40,7 @@
+ my $o_host      = undef;                                    # hostname
+ my $o_community = undef;                                    # community
+ my $o_port      = 161;                                      # port
++my $o_domain    = 'udp/ipv4';                               # protocol
+ my $o_help      = undef;                                    # wan't some help ?
+ my $o_verb      = undef;                                    # verbose mode
+ my $o_version   = undef;                                    # print version
+@@ -93,6 +94,14 @@ sub help {
+    <privproto> : Priv protocole (des|aes : default des) 
+ -P, --port=PORT
+    SNMP port (Default 161)
++--protocol=PROTOCOL
++   Network protocol to be used
++   ['udp/ipv4'] : UDP over IPv4
++    'udp/ipv6'  : UDP over IPv6
++    'tcp/ipv4'  : TCP over IPv4
++    'tcp/ipv6'  : TCP over IPv6
++
++   Network protocol (Default udp/ipv4)
+ -t, --timeout=INTEGER
+    timeout for SNMP in seconds (Default: 5)
+ -V, --version
+@@ -114,6 +123,7 @@ sub check_options {
+         'hostname:s'  => \$o_host,
+         'p:i'         => \$o_port,
+         'port:i'      => \$o_port,
++        'protocol:s'  => \$o_domain,
+         'C:s'         => \$o_community,
+         'community:s' => \$o_community,
+         'l:s'         => \$o_login,
+@@ -210,7 +220,8 @@ sub check_options {
+             -username     => $o_login,
+             -authpassword => $o_passwd,
+             -authprotocol => $o_authproto,
+-            -timeout      => $o_timeout
++            -timeout      => $o_timeout,
++            -domain       => $o_domain
+         );
+     } else {
+         verb("SNMPv3 AuthPriv login : $o_login, $o_authproto, $o_privproto");
+@@ -223,7 +234,8 @@ sub check_options {
+             -authprotocol => $o_authproto,
+             -privpassword => $o_privpass,
+             -privprotocol => $o_privproto,
+-            -timeout      => $o_timeout
++            -timeout      => $o_timeout,
++            -domain       => $o_domain
+         );
+     }
+ } else {
+@@ -236,7 +248,8 @@ sub check_options {
+             -version   => 2,
+             -community => $o_community,
+             -port      => $o_port,
+-            -timeout   => $o_timeout
++            -timeout   => $o_timeout,
++            -domain    => $o_domain
+         );
+     } else {
+ 
+@@ -246,7 +259,8 @@ sub check_options {
+             -hostname  => $o_host,
+             -community => $o_community,
+             -port      => $o_port,
+-            -timeout   => $o_timeout
++            -timeout   => $o_timeout,
++            -domain    => $o_domain
+         );
+     }
+ }
+diff --git a/plugins/check_snmp_env.pl b/plugins/check_snmp_env.pl
+index 8e15bc0..3624d4f 100755
+--- a/plugins/check_snmp_env.pl
++++ b/plugins/check_snmp_env.pl
+@@ -172,6 +172,7 @@
+ my $o_host      = undef;                                  # hostname
+ my $o_community = undef;                                  # community
+ my $o_port      = 161;                                    # port
++my $o_domain    = 'udp/ipv4';                             # protocol
+ my $o_help      = undef;                                  # wan't some help ?
+ my $o_verb      = undef;                                  # verbose mode
+ my $o_version   = undef;                                  # print version
+@@ -242,6 +243,14 @@ sub help {
+    <privproto> : Priv protocole (des|aes : default des) 
+ -P, --port=PORT
+    SNMP port (Default 161)
++--protocol=PROTOCOL
++   Network protocol to be used
++   ['udp/ipv4'] : UDP over IPv4
++    'udp/ipv6'  : UDP over IPv6
++    'tcp/ipv4'  : TCP over IPv4
++    'tcp/ipv6'  : TCP over IPv6
++
++   Network protocol (Default udp/ipv4)
+ -T, --type=cisco|nokia|bc|iron|foundry
+    Environemental check : 
+ 	cisco : All Cisco equipements : voltage,temp,fan,power supply
+@@ -278,6 +287,7 @@ sub check_options {
+         'hostname:s'  => \$o_host,
+         'p:i'         => \$o_port,
+         'port:i'      => \$o_port,
++        'protocol:s'  => \$o_domain,
+         'C:s'         => \$o_community,
+         'community:s' => \$o_community,
+         'l:s'         => \$o_login,
+@@ -388,7 +398,8 @@ sub check_options {
+             -username     => $o_login,
+             -authpassword => $o_passwd,
+             -authprotocol => $o_authproto,
+-            -timeout      => $o_timeout
++            -timeout      => $o_timeout,
++            -domain       => $o_domain
+         );
+     } else {
+         verb("SNMPv3 AuthPriv login : $o_login, $o_authproto, $o_privproto");
+@@ -401,7 +412,8 @@ sub check_options {
+             -authprotocol => $o_authproto,
+             -privpassword => $o_privpass,
+             -privprotocol => $o_privproto,
+-            -timeout      => $o_timeout
++            -timeout      => $o_timeout,
++            -domain       => $o_domain
+         );
+     }
+ } else {
+@@ -414,7 +426,8 @@ sub check_options {
+             -version   => 2,
+             -community => $o_community,
+             -port      => $o_port,
+-            -timeout   => $o_timeout
++            -timeout   => $o_timeout,
++            -domain    => $o_domain
+         );
+     } else {
+ 
+@@ -424,7 +437,8 @@ sub check_options {
+             -hostname  => $o_host,
+             -community => $o_community,
+             -port      => $o_port,
+-            -timeout   => $o_timeout
++            -timeout   => $o_timeout,
++            -domain    => $o_domain
+         );
+     }
+ }
+diff --git a/plugins/check_snmp_int.pl b/plugins/check_snmp_int.pl
+index 71f8d14..b1214e2 100755
+--- a/plugins/check_snmp_int.pl
++++ b/plugins/check_snmp_int.pl
+@@ -62,6 +62,7 @@
+ # Standard options
+ my $o_host              = undef;    # hostname
+ my $o_port              = 161;      # port
++my $o_domain            = 'udp/ipv4'; # protocol
+ my $o_descr             = undef;    # description filter
+ my $o_help              = undef;    # wan't some help ?
+ my $o_admin             = undef;    # admin status instead of oper
+@@ -208,6 +209,14 @@ sub help {
+    <privproto> : Priv protocole (des|aes : default des) 
+ -P, --port=PORT
+    SNMP port (Default 161)
++--protocol=PROTOCOL
++   Network protocol to be used
++   ['udp/ipv4'] : UDP over IPv4
++    'udp/ipv6'  : UDP over IPv6
++    'tcp/ipv4'  : TCP over IPv4
++    'tcp/ipv6'  : TCP over IPv6
++
++   Network protocol (Default udp/ipv4)
+ -n, --name=NAME
+    Name in description OID (eth0, ppp0 ...).
+    This is treated as a regexp : -n eth will match eth0,eth1,...
+@@ -296,6 +305,7 @@ sub check_options {
+         'hostname:s'    => \$o_host,
+         'p:i'           => \$o_port,
+         'port:i'        => \$o_port,
++        'protocol:s'    => \$o_domain,
+         'n:s'           => \$o_descr,
+         'name:s'        => \$o_descr,
+         'N'             => \$o_use_ifname,
+@@ -536,7 +546,8 @@ sub check_options {
+             -username     => $o_login,
+             -authpassword => $o_passwd,
+             -authprotocol => $o_authproto,
+-            -timeout      => $o_timeout
++            -timeout      => $o_timeout,
++            -domain       => $o_domain
+         );
+     } else {
+         verb("SNMPv3 AuthPriv login : $o_login, $o_authproto, $o_privproto");
+@@ -549,7 +560,8 @@ sub check_options {
+             -authprotocol => $o_authproto,
+             -privpassword => $o_privpass,
+             -privprotocol => $o_privproto,
+-            -timeout      => $o_timeout
++            -timeout      => $o_timeout,
++            -domain       => $o_domain
+         );
+     }
+ } else {
+@@ -562,7 +574,8 @@ sub check_options {
+             -version   => 2,
+             -community => $o_community,
+             -port      => $o_port,
+-            -timeout   => $o_timeout
++            -timeout   => $o_timeout,
++            -domain    => $o_domain
+         );
+     } else {
+ 
+@@ -572,7 +585,8 @@ sub check_options {
+             -hostname  => $o_host,
+             -community => $o_community,
+             -port      => $o_port,
+-            -timeout   => $o_timeout
++            -timeout   => $o_timeout,
++            -domain    => $o_domain
+         );
+     }
+ }
+diff --git a/plugins/check_snmp_linkproof_nhr.pl b/plugins/check_snmp_linkproof_nhr.pl
+index b6dba28..d83932e 100755
+--- a/plugins/check_snmp_linkproof_nhr.pl
++++ b/plugins/check_snmp_linkproof_nhr.pl
+@@ -34,6 +34,7 @@
+ my $o_host      = undef;                           # hostname
+ my $o_community = undef;                           # community
+ my $o_port      = 161;                             # port
++my $o_domain    = 'udp/ipv4';                      # protocol
+ my $o_help      = undef;                           # wan't some help ?
+ my $o_verb      = undef;                           # verbose mode
+ my $o_version   = undef;                           # print version
+@@ -98,6 +99,14 @@ sub help {
+    <privproto> : Priv protocole (des|aes : default des) 
+ -P, --port=PORT
+    SNMP port (Default 161)
++--protocol=PROTOCOL
++   Network protocol to be used
++   ['udp/ipv4'] : UDP over IPv4
++    'udp/ipv6'  : UDP over IPv6
++    'tcp/ipv4'  : TCP over IPv4
++    'tcp/ipv6'  : TCP over IPv6
++
++   Network protocol (Default udp/ipv4)
+ -f, --perfparse, --perfdata
+    Performance data output
+ -t, --timeout=INTEGER
+@@ -121,6 +130,7 @@ sub check_options {
+         'hostname:s'  => \$o_host,
+         'p:i'         => \$o_port,
+         'port:i'      => \$o_port,
++        'protocol:s'  => \$o_domain,
+         'C:s'         => \$o_community,
+         'community:s' => \$o_community,
+         'l:s'         => \$o_login,
+@@ -215,7 +225,8 @@ sub check_options {
+             -username     => $o_login,
+             -authpassword => $o_passwd,
+             -authprotocol => $o_authproto,
+-            -timeout      => $o_timeout
++            -timeout      => $o_timeout,
++            -domain       => $o_domain
+         );
+     } else {
+         verb("SNMPv3 AuthPriv login : $o_login, $o_authproto, $o_privproto");
+@@ -228,7 +239,8 @@ sub check_options {
+             -authprotocol => $o_authproto,
+             -privpassword => $o_privpass,
+             -privprotocol => $o_privproto,
+-            -timeout      => $o_timeout
++            -timeout      => $o_timeout,
++            -domain       => $o_domain
+         );
+     }
+ } else {
+@@ -241,7 +253,8 @@ sub check_options {
+             -version   => 2,
+             -community => $o_community,
+             -port      => $o_port,
+-            -timeout   => $o_timeout
++            -timeout   => $o_timeout,
++            -domain    => $o_domain
+         );
+     } else {
+ 
+@@ -251,7 +264,8 @@ sub check_options {
+             -hostname  => $o_host,
+             -community => $o_community,
+             -port      => $o_port,
+-            -timeout   => $o_timeout
++            -timeout   => $o_timeout,
++            -domain    => $o_domain
+         );
+     }
+ }
+diff --git a/plugins/check_snmp_nsbox.pl b/plugins/check_snmp_nsbox.pl
+index 97da635..3e7bfcb 100755
+--- a/plugins/check_snmp_nsbox.pl
++++ b/plugins/check_snmp_nsbox.pl
+@@ -42,6 +42,7 @@
+ my $o_host      = undef;                                  # hostname
+ my $o_community = undef;                                  # community
+ my $o_port      = 161;                                    # port
++my $o_domain    = 'udp/ipv4';                             # protocol
+ my $o_help      = undef;                                  # wan't some help ?
+ my $o_verb      = undef;                                  # verbose mode
+ my $o_version   = undef;                                  # print version
+@@ -125,6 +126,14 @@ sub help {
+ 	number of diode and vhost that must be up.	
+ -P, --port=PORT
+    SNMP port (Default 161)
++--protocol=PROTOCOL
++   Network protocol to be used
++   ['udp/ipv4'] : UDP over IPv4
++    'udp/ipv6'  : UDP over IPv6
++    'tcp/ipv4'  : TCP over IPv4
++    'tcp/ipv6'  : TCP over IPv6
++
++   Network protocol (Default udp/ipv4)
+ -f, --perfparse, --perfdata
+    Performance data output
+ -t, --timeout=INTEGER
+@@ -148,6 +157,7 @@ sub check_options {
+         'hostname:s'  => \$o_host,
+         'p:i'         => \$o_port,
+         'port:i'      => \$o_port,
++        'protocol:s'  => \$o_domain,
+         'C:s'         => \$o_community,
+         'community:s' => \$o_community,
+         'l:s'         => \$o_login,
+@@ -270,7 +280,8 @@ sub check_options {
+             -username     => $o_login,
+             -authpassword => $o_passwd,
+             -authprotocol => $o_authproto,
+-            -timeout      => $o_timeout
++            -timeout      => $o_timeout,
++            -domain       => $o_domain
+         );
+     } else {
+         verb("SNMPv3 AuthPriv login : $o_login, $o_authproto, $o_privproto");
+@@ -283,7 +294,8 @@ sub check_options {
+             -authprotocol => $o_authproto,
+             -privpassword => $o_privpass,
+             -privprotocol => $o_privproto,
+-            -timeout      => $o_timeout
++            -timeout      => $o_timeout,
++            -domain       => $o_domain
+         );
+     }
+ } else {
+@@ -296,7 +308,8 @@ sub check_options {
+             -version   => 2,
+             -community => $o_community,
+             -port      => $o_port,
+-            -timeout   => $o_timeout
++            -timeout   => $o_timeout,
++            -domain    => $o_domain
+         );
+     } else {
+ 
+@@ -306,7 +319,8 @@ sub check_options {
+             -hostname  => $o_host,
+             -community => $o_community,
+             -port      => $o_port,
+-            -timeout   => $o_timeout
++            -timeout   => $o_timeout,
++            -domain    => $o_domain
+         );
+     }
+ }
+diff --git a/plugins/check_snmp_vrrp.pl b/plugins/check_snmp_vrrp.pl
+index b6d4d44..f9c19ec 100755
+--- a/plugins/check_snmp_vrrp.pl
++++ b/plugins/check_snmp_vrrp.pl
+@@ -89,6 +89,7 @@
+ my $o_community = undef;      # community
+ my $o_version2  = undef;      #use snmp v2c
+ my $o_port      = 161;        # port
++my $o_domain    = 'udp/ipv4'; # protocol
+ my $o_help      = undef;      # wan't some help ?
+ my $o_verb      = undef;      # verbose mode
+ my $o_version   = undef;      # print version
+@@ -147,6 +148,14 @@ sub help {
+    <privproto> : Priv protocole (des|aes : default des) 
+ -P, --port=PORT
+    SNMP port (Default 161)
++--protocol=PROTOCOL
++   Network protocol to be used
++   ['udp/ipv4'] : UDP over IPv4
++    'udp/ipv6'  : UDP over IPv6
++    'tcp/ipv4'  : TCP over IPv4
++    'tcp/ipv6'  : TCP over IPv6
++
++   Network protocol (Default udp/ipv4)
+ -T, --type=<nokia|alteon|lp|nsc|ipso>
+    Type of vrrp router to check
+    nokia (default) : Nokia vrrp. Should be working for most vrrp routers
+@@ -187,6 +196,7 @@ sub check_options {
+         'hostname:s'  => \$o_host,
+         'p:i'         => \$o_port,
+         'port:i'      => \$o_port,
++        'protocol:s'  => \$o_domain,
+         'C:s'         => \$o_community,
+         'community:s' => \$o_community,
+         't:i'         => \$o_timeout,
+@@ -317,7 +327,8 @@ sub check_options {
+             -authpassword => $o_passwd,
+             -authprotocol => $o_authproto,
+             -port         => $o_port,
+-            -timeout      => $o_timeout
++            -timeout      => $o_timeout,
++            -domain       => $o_domain
+         );
+     } else {
+         verb("SNMPv3 AuthPriv login : $o_login, $o_authproto, $o_privproto");
+@@ -330,7 +341,8 @@ sub check_options {
+             -privpassword => $o_privpass,
+             -privprotocol => $o_privproto,
+             -port         => $o_port,
+-            -timeout      => $o_timeout
++            -timeout      => $o_timeout,
++            -domain       => $o_domain
+         );
+     }
+ } else {
+@@ -343,7 +355,8 @@ sub check_options {
+             -version   => 2,
+             -community => $o_community,
+             -port      => $o_port,
+-            -timeout   => $o_timeout
++            -timeout   => $o_timeout,
++            -domain    => $o_domain
+         );
+     } else {
+ 
+@@ -353,7 +366,8 @@ sub check_options {
+             -hostname  => $o_host,
+             -community => $o_community,
+             -port      => $o_port,
+-            -timeout   => $o_timeout
++            -timeout   => $o_timeout,
++            -domain    => $o_domain
+         );
+     }
+ }
+diff --git a/plugins/check_snmp_win.pl b/plugins/check_snmp_win.pl
+index c5cb573..1240b46 100755
+--- a/plugins/check_snmp_win.pl
++++ b/plugins/check_snmp_win.pl
+@@ -50,6 +50,7 @@
+ my $o_host        = undef;        # hostname
+ my $o_community   = undef;        # community
+ my $o_port        = 161;          # port
++my $o_domain      = 'udp/ipv4';   # protocol
+ my $o_version2    = undef;        # use snmp v2c
+ my $o_descr       = undef;        # description filter
+ my @o_descrL      = undef;        # Service descriprion list.
+@@ -115,6 +116,14 @@ sub help {
+    Password for snmpv3 authentication
+ -p, --port=PORT
+    SNMP port (Default 161)
++--protocol=PROTOCOL
++   Network protocol to be used
++   ['udp/ipv4'] : UDP over IPv4
++    'udp/ipv6'  : UDP over IPv6
++    'tcp/ipv4'  : TCP over IPv4
++    'tcp/ipv6'  : TCP over IPv6
++
++   Network protocol (Default udp/ipv4)
+ -T, --type=service
+    Check type : 
+      - service (default) checks service
+@@ -173,6 +182,7 @@ sub check_options {
+         'hostname:s'    => \$o_host,
+         'p:i'           => \$o_port,
+         'port:i'        => \$o_port,
++        'protocol:s'    => \$o_domain,
+         'C:s'           => \$o_community,
+         'community:s'   => \$o_community,
+         'l:s'           => \$o_login,
+@@ -265,7 +275,8 @@ sub check_options {
+         -authpassword => $o_passwd,
+         -authprotocol => 'md5',
+         -privpassword => $o_passwd,
+-        -timeout      => $o_timeout
++        -timeout      => $o_timeout,
++        -domain       => $o_domain
+     );
+ } else {
+     if (defined($o_version2)) {
+@@ -276,7 +287,8 @@ sub check_options {
+             -version   => 2,
+             -community => $o_community,
+             -port      => $o_port,
+-            -timeout   => $o_timeout
++            -timeout   => $o_timeout,
++            -domain    => $o_domain
+         );
+     } else {
+ 
+@@ -285,7 +297,8 @@ sub check_options {
+             -hostname  => $o_host,
+             -community => $o_community,
+             -port      => $o_port,
+-            -timeout   => $o_timeout
++            -timeout   => $o_timeout,
++            -domain    => $o_domain
+         );
+     }
+ }
