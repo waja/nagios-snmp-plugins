@@ -1,8 +1,14 @@
-nagios-snmp-plugins (2.1.0-4) UNRELEASED; urgency=medium
+nagios-snmp-plugins (2.1.0-4) unstable; urgency=medium
 
-  *
+  [ Bas Couwenberg ]
+  * [13ac6fb] Explicitly enable test-build-twice job.
 
- -- Jan Wagner <waja@cyconet.org>  Mon, 23 Jan 2023 14:23:45 +0000
+  [ Jan Wagner ]
+  * [67af323] Adding d/p/23_check_snmp_int_interface_speed from upsgtream
+  * [d0702fa] Adding d/p/24_tcp_udp_ipv4_ipv6 from upsgtream
+  * [5638743] Adding d/p/25_check_snmp_int_add_metrik from upsgtream
+
+ -- Jan Wagner <waja@cyconet.org>  Tue, 23 Jul 2024 05:44:14 +0000
 
 nagios-snmp-plugins (2.1.0-3) unstable; urgency=medium
 
