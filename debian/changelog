@@ -1,8 +1,11 @@
-nagios-snmp-plugins (2.1.0-5) UNRELEASED; urgency=medium
+nagios-snmp-plugins (2.1.0-5) unstable; urgency=medium
 
-  * 
+  [ Bas Couwenberg ]
+  * [133cc65] Bump Standards-Version to 4.7.0, no changes.
+  * [0556666] Bump Standards-Version to 4.7.2, no changes.
+  * [8b74a54] Fix old FSF address in copyright file.
 
- -- Jan Wagner <waja@cyconet.org>  Tue, 23 Jul 2024 08:00:17 +0200
+ -- Jan Wagner <waja@cyconet.org>  Sun, 20 Apr 2025 18:52:04 +0000
 
 nagios-snmp-plugins (2.1.0-4) unstable; urgency=medium
 
