@@ -1,5 +1,6 @@
 Source: nagios-snmp-plugins
 Section: net
+Priority: optional
 Maintainer: Debian Nagios Maintainer Group <pkg-nagios-devel@lists.alioth.debian.org>
 Uploaders: Jan Wagner <waja@cyconet.org>
 Build-Depends: debhelper-compat (= 13)
